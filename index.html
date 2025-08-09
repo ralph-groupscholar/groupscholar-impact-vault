@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group Scholar Impact Vault</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="vault.js"></script>
+  </head>
+  <body>
+    <div class="grain"></div>
+    <header class="hero">
+      <nav class="nav">
+        <div class="logo">Group Scholar Impact Vault</div>
+        <div class="nav-actions">
+          <button class="ghost">Weekly Brief</button>
+          <button class="solid">Open Vault</button>
+        </div>
+      </nav>
+      <div class="hero-content">
+        <div>
+          <p class="eyebrow">Scholarship Intelligence Library</p>
+          <h1>Turn program signals into ready-to-share impact stories.</h1>
+          <p class="lede">
+            The Impact Vault curates scholar journeys, partner readiness, and outcomes evidence in one
+            place so every update feels informed, human, and measurable.
+          </p>
+          <div class="hero-actions">
+            <button class="solid">Start a Brief</button>
+            <button class="ghost">Explore Insights</button>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="panel-header">
+            <span>Pulse Summary</span>
+            <span class="timestamp">Updated today</span>
+          </div>
+          <div class="panel-grid">
+            <div>
+              <p class="panel-label">Active Scholars</p>
+              <p class="panel-value">482</p>
+              <p class="panel-meta">+6% month-over-month</p>
+            </div>
+            <div>
+              <p class="panel-label">Partner Confidence</p>
+              <p class="panel-value">92%</p>
+              <p class="panel-meta">14 partners on track</p>
+            </div>
+            <div>
+              <p class="panel-label">Outcome Proof</p>
+              <p class="panel-value">38</p>
+              <p class="panel-meta">Verified milestones</p>
+            </div>
+            <div>
+              <p class="panel-label">Next Risks</p>
+              <p class="panel-value">3</p>
+              <p class="panel-meta">Escalations pending</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="vault">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Insight Library</p>
+            <h2>Filter by program signal, then build your weekly narrative.</h2>
+          </div>
+          <div class="filter-actions">
+            <button class="chip active" data-filter="all">All</button>
+            <button class="chip" data-filter="scholar">Scholar Journey</button>
+            <button class="chip" data-filter="partner">Partner Readiness</button>
+            <button class="chip" data-filter="impact">Impact Proof</button>
+            <button class="chip" data-filter="risk">Risk Watch</button>
+          </div>
+        </div>
+
+        <div class="vault-grid" id="vault-grid">
+          <article class="vault-card" data-category="scholar">
+            <div class="card-top">
+              <span class="tag">Scholar Journey</span>
+              <span class="time">2 days ago</span>
+            </div>
+            <h3>Retention lift after cohort mentoring pilot</h3>
+            <p>
+              Scholars in the peer-mentored cohort completed 1.8x more milestones with a 12% higher
+              retention rate than control groups.
+            </p>
+            <div class="card-meta">Owner: Scholar Success · Evidence: Survey + CRM</div>
+          </article>
+          <article class="vault-card" data-category="partner">
+            <div class="card-top">
+              <span class="tag">Partner Readiness</span>
+              <span class="time">3 days ago</span>
+            </div>
+            <h3>Employer partners ready for spring placement surge</h3>
+            <p>
+              9 partners have confirmed placement slots with onboarding assets delivered and hiring
+              managers trained on support standards.
+            </p>
+            <div class="card-meta">Owner: Partnerships · Evidence: Partner CRM</div>
+          </article>
+          <article class="vault-card" data-category="impact">
+            <div class="card-top">
+              <span class="tag">Impact Proof</span>
+              <span class="time">4 days ago</span>
+            </div>
+            <h3>First-gen graduation outcomes verified</h3>
+            <p>
+              17 scholars officially crossed graduation milestones, with 11 landing in roles aligned
+              to their declared pathways.
+            </p>
+            <div class="card-meta">Owner: Impact · Evidence: Institutional records</div>
+          </article>
+          <article class="vault-card" data-category="risk">
+            <div class="card-top">
+              <span class="tag">Risk Watch</span>
+              <span class="time">Yesterday</span>
+            </div>
+            <h3>Financial aid gaps emerging for two campuses</h3>
+            <p>
+              Aid offices report delayed award packaging; recommend targeted outreach and bridge
+              funding contingency planning.
+            </p>
+            <div class="card-meta">Owner: Operations · Evidence: Campus reports</div>
+          </article>
+          <article class="vault-card" data-category="impact">
+            <div class="card-top">
+              <span class="tag">Impact Proof</span>
+              <span class="time">5 days ago</span>
+            </div>
+            <h3>Scholar leadership pipeline hits 80% participation</h3>
+            <p>
+              Leadership programming participation increased after introducing micro-credentialing
+              and alumni storytelling sessions.
+            </p>
+            <div class="card-meta">Owner: Programs · Evidence: Attendance + LMS</div>
+          </article>
+          <article class="vault-card" data-category="scholar">
+            <div class="card-top">
+              <span class="tag">Scholar Journey</span>
+              <span class="time">6 days ago</span>
+            </div>
+            <h3>Well-being check-ins signal higher stress in finals window</h3>
+            <p>
+              Mental health touchpoints show a 22% increase in stress markers; deploy finals week
+              support plan and advisor staffing.
+            </p>
+            <div class="card-meta">Owner: Care Team · Evidence: Check-in dashboard</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="signal">
+        <div>
+          <p class="eyebrow">Brief Builder</p>
+          <h2>Weekly briefing cadence in three moves.</h2>
+          <ul class="signal-list">
+            <li>
+              <strong>Collect</strong> signals from scholar support, partnerships, and impact QA in a
+              shared intake board.
+            </li>
+            <li>
+              <strong>Curate</strong> the three most important wins, risks, and asks with sources
+              linked to every claim.
+            </li>
+            <li>
+              <strong>Publish</strong> the 60-second narrative to leadership, donors, and campus
+              champions.
+            </li>
+          </ul>
+        </div>
+        <div class="signal-panel">
+          <h3>Weekly Brief Template</h3>
+          <div class="template-item">
+            <span class="template-label">Headline</span>
+            <span class="template-value">"Scholar placements accelerate as partners expand"</span>
+          </div>
+          <div class="template-item">
+            <span class="template-label">Wins</span>
+            <span class="template-value">2 verified outcomes + mentoring lift</span>
+          </div>
+          <div class="template-item">
+            <span class="template-label">Risks</span>
+            <span class="template-value">Aid delays + advising coverage</span>
+          </div>
+          <div class="template-item">
+            <span class="template-label">Asks</span>
+            <span class="template-value">Approve bridge fund + partner intro</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <h2>Ready to unlock the Impact Vault?</h2>
+        <p>Launch your next briefing with the latest scholar, partner, and outcome signals.</p>
+      </div>
+      <button class="solid">Generate Brief</button>
+    </footer>
+  </body>
+</html>
