@@ -8,3 +8,4 @@
 - Built the Impact Vault landing experience with a filterable insight library and briefing cadence section.
 - Added a pulse summary hero to spotlight weekly outcomes, partner readiness, and risks.
 - Established the visual system, layout, and interaction styling for the first release.
+- Deployed to https://groupscholar-impact-vault.vercel.app.
