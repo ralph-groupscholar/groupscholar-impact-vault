@@ -9,3 +9,14 @@
 - Added a pulse summary hero to spotlight weekly outcomes, partner readiness, and risks.
 - Established the visual system, layout, and interaction styling for the first release.
 - Deployed to https://groupscholar-impact-vault.vercel.app.
+
+## Iteration 2 - 2026-02-07 16:20:08 EST
+- Added the Evidence Locker section to anchor proof, confidence, and decision tracking.
+- Crafted new evidence cards covering source registry, confidence rubric, decision log, and scholar voice.
+- Expanded visual styling for the evidence panel to reinforce audit-ready storytelling.
+- Redeployed to https://groupscholar-impact-vault.vercel.app.
+
+## Iteration 3 - 2026-02-07 16:29:12 EST
+- Added a Signal Coverage section to summarize verification, equity watch, and partner readiness signals.
+- Built a leadership decision log panel with action-ready cards and owner timelines.
+- Expanded styling for the new coverage and decision layouts to keep the brief builder cohesive.
