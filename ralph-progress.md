@@ -35,3 +35,13 @@
 - Added a Cohort Momentum studio section with lift tracking, funding forecast, and partner follow-through cards.
 - Built a 30-day timeline snapshot to align weekly focus areas and highlight upcoming impact proof handoffs.
 - Extended the visual system with momentum layouts, accented cards, and timeline styling.
+
+## Iteration 4 - 2026-02-07 16:23:19 EST
+- Implemented interactive signal selection so vault cards populate a briefing pack in real time.
+- Added narrative balance logic with guidance copy that updates based on selected signal mix.
+- Styled the brief composer panels, selection list, and selected-state visuals to reinforce focus.
+
+## Iteration 5 - 2026-02-07 16:25:01 EST
+- Removed duplicated selection logic and normalized the brief composer behavior into one clear flow.
+- Aligned card selection with the existing data-id attributes and streamlined balance updates.
+- Simplified vault filtering and selection updates to reduce inconsistent state issues.
