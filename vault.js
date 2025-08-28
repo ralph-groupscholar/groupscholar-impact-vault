@@ -6,6 +6,10 @@ const selectionHint = document.querySelector("#selection-hint");
 const clearSelection = document.querySelector("#clear-selection");
 const balanceValues = document.querySelectorAll(".balance-value");
 const briefCallout = document.querySelector("#brief-callout");
+const briefOutput = document.querySelector("#brief-output");
+const copyBrief = document.querySelector("#copy-brief");
+const downloadBrief = document.querySelector("#download-brief");
+const briefStatus = document.querySelector("#brief-status");
 
 const selectedCards = new Map();
 
@@ -14,6 +18,16 @@ const categoryLabels = {
   partner: "Partner Readiness",
   impact: "Impact Proof",
   risk: "Risk Watch",
+};
+
+const getCounts = () => {
+  const counts = { scholar: 0, partner: 0, impact: 0, risk: 0 };
+  selectedCards.forEach((entry) => {
+    if (counts[entry.category] !== undefined) {
+      counts[entry.category] += 1;
+    }
+  });
+  return counts;
 };
 
 const setActive = (selected) => {
@@ -65,12 +79,7 @@ const buildSelectionItem = (entry) => {
 };
 
 const updateBalance = () => {
-  const counts = { scholar: 0, partner: 0, impact: 0, risk: 0 };
-  selectedCards.forEach((entry) => {
-    if (counts[entry.category] !== undefined) {
-      counts[entry.category] += 1;
-    }
-  });
+  const counts = getCounts();
 
   balanceValues.forEach((value) => {
     const category = value.dataset.summary;
@@ -109,6 +118,53 @@ const updateBalance = () => {
   selectionHint.textContent = "Balanced coverage achieved";
 };
 
+const formatBriefDate = () =>
+  new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+const buildBriefText = () => {
+  const total = selectedCards.size;
+  const counts = getCounts();
+  const lines = [];
+
+  lines.push(`Group Scholar Impact Brief — ${formatBriefDate()}`);
+  lines.push(`Signals selected: ${total}`);
+  lines.push(
+    `Balance: Scholar ${counts.scholar} | Partner ${counts.partner} | Impact ${counts.impact} | Risk ${counts.risk}`
+  );
+  lines.push("");
+
+  if (total === 0) {
+    lines.push("Select 3-5 signals to generate a full brief pack.");
+    return lines.join("\n");
+  }
+
+  lines.push("Highlights:");
+  selectedCards.forEach((entry) => {
+    const label = categoryLabels[entry.category] || "Signal";
+    const meta = entry.meta ? ` (${entry.meta})` : "";
+    lines.push(`- [${label}] ${entry.title}${meta}`);
+  });
+  lines.push("");
+  lines.push(`Narrative guidance: ${briefCallout.textContent}`);
+
+  return lines.join("\n");
+};
+
+const updateBriefOutput = () => {
+  if (!briefOutput) {
+    return;
+  }
+  if (briefStatus) {
+    briefStatus.textContent = "";
+  }
+  briefOutput.value = buildBriefText();
+};
+
 const updateSelectionList = () => {
   selectionList.innerHTML = "";
 
@@ -119,6 +175,7 @@ const updateSelectionList = () => {
     selectionList.appendChild(empty);
     selectionCount.textContent = "0";
     updateBalance();
+    updateBriefOutput();
     return;
   }
 
@@ -128,6 +185,7 @@ const updateSelectionList = () => {
 
   selectionCount.textContent = String(selectedCards.size);
   updateBalance();
+  updateBriefOutput();
 };
 
 const toggleSelection = (card) => {
@@ -184,6 +242,47 @@ clearSelection?.addEventListener("click", () => {
     card.setAttribute("aria-pressed", "false");
   });
   updateSelectionList();
+});
+
+copyBrief?.addEventListener("click", async () => {
+  if (!briefOutput) {
+    return;
+  }
+
+  const text = briefOutput.value;
+  try {
+    await navigator.clipboard.writeText(text);
+    if (briefStatus) {
+      briefStatus.textContent = "Brief copied to clipboard.";
+    }
+  } catch (error) {
+    briefOutput.select();
+    document.execCommand("copy");
+    if (briefStatus) {
+      briefStatus.textContent = "Brief copied. Paste it into your briefing deck.";
+    }
+  }
+});
+
+downloadBrief?.addEventListener("click", () => {
+  if (!briefOutput) {
+    return;
+  }
+
+  const blob = new Blob([briefOutput.value], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `impact-brief-${stamp}.txt`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+
+  if (briefStatus) {
+    briefStatus.textContent = "Brief downloaded as text.";
+  }
 });
 
 updateSelectionList();

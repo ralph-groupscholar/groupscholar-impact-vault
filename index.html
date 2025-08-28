@@ -440,7 +440,12 @@
               coverage in minutes.
             </p>
           </div>
-          <button class="ghost" id="clear-selection">Clear selections</button>
+          <div class="brief-actions">
+            <button class="ghost" id="clear-selection">Clear selections</button>
+            <button class="ghost" id="copy-brief" disabled>Copy brief</button>
+            <button class="ghost" id="download-brief" disabled>Download .txt</button>
+            <span class="brief-status" id="brief-status">No brief generated yet.</span>
+          </div>
         </div>
         <div class="brief-pack-grid">
           <div class="brief-panel">
@@ -456,6 +461,10 @@
             <ul class="selection-list" id="selection-list">
               <li class="selection-empty">No signals selected yet. Tap a card to add it here.</li>
             </ul>
+            <div class="brief-draft">
+              <h4>Brief Draft</h4>
+              <pre id="brief-draft">Select signals to generate a draft briefing narrative.</pre>
+            </div>
           </div>
           <div class="brief-panel accent">
             <h3>Narrative Balance</h3>
@@ -482,6 +491,20 @@
               <p class="brief-callout-text" id="brief-callout">
                 Select signals to unlock a weekly highlight narrative.
               </p>
+            </div>
+          </div>
+          <div class="brief-panel brief-export">
+            <div class="brief-panel-header">
+              <div>
+                <h3>Brief Export</h3>
+                <p>Copy or download the weekly pack in one click.</p>
+              </div>
+            </div>
+            <textarea id="brief-output" class="brief-output" rows="10" readonly></textarea>
+            <div class="brief-actions">
+              <button class="solid" id="copy-brief">Copy brief</button>
+              <button class="ghost" id="download-brief">Download .txt</button>
+              <span class="brief-status" id="brief-status" aria-live="polite"></span>
             </div>
           </div>
         </div>

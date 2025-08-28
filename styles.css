@@ -252,6 +252,23 @@ main {
   gap: 24px;
 }
 
+.brief-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.brief-status {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.brief-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .brief-pack-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -274,6 +291,11 @@ main {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+}
+
+.brief-panel-header p {
+  margin: 6px 0 0;
+  font-size: 14px;
 }
 
 .selection-list {
@@ -326,6 +348,29 @@ main {
   padding: 0;
 }
 
+.brief-draft {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(16, 20, 24, 0.04);
+}
+
+.brief-draft h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.brief-draft pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
 .balance-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -371,6 +416,42 @@ main {
 
 .brief-callout-text {
   margin: 0;
+}
+
+.brief-export {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.brief-output {
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  border-radius: 14px;
+  border: 1px solid rgba(16, 20, 24, 0.12);
+  padding: 16px;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  font-size: 14px;
+  background: rgba(15, 59, 87, 0.04);
+  color: var(--ink);
+}
+
+.brief-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.brief-actions .solid,
+.brief-actions .ghost {
+  padding: 10px 18px;
+}
+
+.brief-status {
+  font-size: 13px;
+  color: var(--muted);
 }
 
 .coverage {

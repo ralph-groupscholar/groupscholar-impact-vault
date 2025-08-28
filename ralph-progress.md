@@ -45,3 +45,8 @@
 - Removed duplicated selection logic and normalized the brief composer behavior into one clear flow.
 - Aligned card selection with the existing data-id attributes and streamlined balance updates.
 - Simplified vault filtering and selection updates to reduce inconsistent state issues.
+
+## Iteration 6 - 2026-02-07 16:28:18 EST
+- Added a Brief Export panel that generates a share-ready weekly pack from selected signals.
+- Implemented copy + download actions so teams can move the brief into decks quickly.
+- Styled the export panel with a readable text preview and action row.
