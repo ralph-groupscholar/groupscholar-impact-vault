@@ -1,0 +1,13 @@
+{
+  "name": "groupscholar-impact-vault",
+  "version": "1.0.0",
+  "description": "Group Scholar Impact Vault",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "seed:db": "node scripts/seed-db.js"
+  },
+  "dependencies": {
+    "pg": "^8.11.5"
+  }
+}

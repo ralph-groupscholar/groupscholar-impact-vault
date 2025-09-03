@@ -50,3 +50,13 @@
 - Added a Brief Export panel that generates a share-ready weekly pack from selected signals.
 - Implemented copy + download actions so teams can move the brief into decks quickly.
 - Styled the export panel with a readable text preview and action row.
+
+## Iteration 7 - 2026-02-07 19:40:27 EST
+- Wired the Insight Library to load live signals from the Impact Vault API with refresh support.
+- Added sync status messaging plus signal count and last-sync metadata to keep the feed transparent.
+- Reworked selection handling so dynamically loaded cards keep brief building and filtering intact.
+
+## Iteration 39 - 2026-02-07 19:42:20 EST
+- Connected Impact Vault to the Group Scholar PostgreSQL database with API endpoints for pulse metrics and signal cards.
+- Rebuilt the signal library to load live data with fallback seeds, filter-aware empty states, and updated brief export actions.
+- Added database schema + seed script for signals and pulse snapshots, and configured Vercel env vars (deploy blocked by daily limit).

@@ -33,28 +33,28 @@
         <div class="hero-panel">
           <div class="panel-header">
             <span>Pulse Summary</span>
-            <span class="timestamp">Updated today</span>
+            <span class="timestamp" id="pulse-updated">Updated today</span>
           </div>
           <div class="panel-grid">
             <div>
               <p class="panel-label">Active Scholars</p>
-              <p class="panel-value">482</p>
-              <p class="panel-meta">+6% month-over-month</p>
+              <p class="panel-value" id="pulse-active-count">482</p>
+              <p class="panel-meta" id="pulse-active-meta">+6% month-over-month</p>
             </div>
             <div>
               <p class="panel-label">Partner Confidence</p>
-              <p class="panel-value">92%</p>
-              <p class="panel-meta">14 partners on track</p>
+              <p class="panel-value" id="pulse-partner-confidence">92%</p>
+              <p class="panel-meta" id="pulse-partner-meta">14 partners on track</p>
             </div>
             <div>
               <p class="panel-label">Outcome Proof</p>
-              <p class="panel-value">38</p>
-              <p class="panel-meta">Verified milestones</p>
+              <p class="panel-value" id="pulse-outcome-proof">38</p>
+              <p class="panel-meta" id="pulse-outcome-meta">Verified milestones</p>
             </div>
             <div>
               <p class="panel-label">Next Risks</p>
-              <p class="panel-value">3</p>
-              <p class="panel-meta">Escalations pending</p>
+              <p class="panel-value" id="pulse-risk-count">3</p>
+              <p class="panel-meta" id="pulse-risk-meta">Escalations pending</p>
             </div>
           </div>
         </div>
@@ -68,88 +68,25 @@
             <p class="eyebrow">Insight Library</p>
             <h2>Filter by program signal, then build your weekly narrative.</h2>
           </div>
-          <div class="filter-actions">
-            <button class="chip active" data-filter="all">All</button>
-            <button class="chip" data-filter="scholar">Scholar Journey</button>
-            <button class="chip" data-filter="partner">Partner Readiness</button>
-            <button class="chip" data-filter="impact">Impact Proof</button>
-            <button class="chip" data-filter="risk">Risk Watch</button>
+          <div class="vault-controls">
+            <div class="filter-actions">
+              <button class="chip active" data-filter="all">All</button>
+              <button class="chip" data-filter="scholar">Scholar Journey</button>
+              <button class="chip" data-filter="partner">Partner Readiness</button>
+              <button class="chip" data-filter="impact">Impact Proof</button>
+              <button class="chip" data-filter="risk">Risk Watch</button>
+            </div>
+            <div class="vault-meta">
+              <span class="vault-count" id="vault-count">6 signals</span>
+              <span class="vault-updated" id="vault-updated">Last sync: Today</span>
+              <button class="ghost small" id="refresh-signals" type="button">Refresh signals</button>
+            </div>
           </div>
         </div>
 
+        <div class="vault-status" id="vault-status" aria-live="polite">Loading live signals…</div>
         <div class="vault-grid" id="vault-grid">
-          <article class="vault-card" data-id="signal-1" data-category="scholar" role="button" tabindex="0" aria-pressed="false">
-            <div class="card-top">
-              <span class="tag">Scholar Journey</span>
-              <span class="time">2 days ago</span>
-            </div>
-            <h3>Retention lift after cohort mentoring pilot</h3>
-            <p>
-              Scholars in the peer-mentored cohort completed 1.8x more milestones with a 12% higher
-              retention rate than control groups.
-            </p>
-            <div class="card-meta">Owner: Scholar Success · Evidence: Survey + CRM</div>
-          </article>
-          <article class="vault-card" data-id="signal-2" data-category="partner" role="button" tabindex="0" aria-pressed="false">
-            <div class="card-top">
-              <span class="tag">Partner Readiness</span>
-              <span class="time">3 days ago</span>
-            </div>
-            <h3>Employer partners ready for spring placement surge</h3>
-            <p>
-              9 partners have confirmed placement slots with onboarding assets delivered and hiring
-              managers trained on support standards.
-            </p>
-            <div class="card-meta">Owner: Partnerships · Evidence: Partner CRM</div>
-          </article>
-          <article class="vault-card" data-id="signal-3" data-category="impact" role="button" tabindex="0" aria-pressed="false">
-            <div class="card-top">
-              <span class="tag">Impact Proof</span>
-              <span class="time">4 days ago</span>
-            </div>
-            <h3>First-gen graduation outcomes verified</h3>
-            <p>
-              17 scholars officially crossed graduation milestones, with 11 landing in roles aligned
-              to their declared pathways.
-            </p>
-            <div class="card-meta">Owner: Impact · Evidence: Institutional records</div>
-          </article>
-          <article class="vault-card" data-id="signal-4" data-category="risk" role="button" tabindex="0" aria-pressed="false">
-            <div class="card-top">
-              <span class="tag">Risk Watch</span>
-              <span class="time">Yesterday</span>
-            </div>
-            <h3>Financial aid gaps emerging for two campuses</h3>
-            <p>
-              Aid offices report delayed award packaging; recommend targeted outreach and bridge
-              funding contingency planning.
-            </p>
-            <div class="card-meta">Owner: Operations · Evidence: Campus reports</div>
-          </article>
-          <article class="vault-card" data-id="signal-5" data-category="impact" role="button" tabindex="0" aria-pressed="false">
-            <div class="card-top">
-              <span class="tag">Impact Proof</span>
-              <span class="time">5 days ago</span>
-            </div>
-            <h3>Scholar leadership pipeline hits 80% participation</h3>
-            <p>
-              Leadership programming participation increased after introducing micro-credentialing
-              and alumni storytelling sessions.
-            </p>
-            <div class="card-meta">Owner: Programs · Evidence: Attendance + LMS</div>
-          </article>
-          <article class="vault-card" data-id="signal-6" data-category="scholar" role="button" tabindex="0" aria-pressed="false">
-            <div class="card-top">
-              <span class="tag">Scholar Journey</span>
-              <span class="time">6 days ago</span>
-            </div>
-            <h3>Well-being check-ins signal higher stress in finals window</h3>
-            <p>
-              Mental health touchpoints show a 22% increase in stress markers; deploy finals week
-              support plan and advisor staffing.
-            </p>
-            <div class="card-meta">Owner: Care Team · Evidence: Check-in dashboard</div>
-          </article>
+          <div class="vault-loading">Loading live signals...</div>
         </div>
       </section>
 
@@ -442,9 +379,6 @@
           </div>
           <div class="brief-actions">
             <button class="ghost" id="clear-selection">Clear selections</button>
-            <button class="ghost" id="copy-brief" disabled>Copy brief</button>
-            <button class="ghost" id="download-brief" disabled>Download .txt</button>
-            <span class="brief-status" id="brief-status">No brief generated yet.</span>
           </div>
         </div>
         <div class="brief-pack-grid">
@@ -502,8 +436,8 @@
             </div>
             <textarea id="brief-output" class="brief-output" rows="10" readonly></textarea>
             <div class="brief-actions">
-              <button class="solid" id="copy-brief">Copy brief</button>
-              <button class="ghost" id="download-brief">Download .txt</button>
+              <button class="solid" id="copy-brief" disabled>Copy brief</button>
+              <button class="ghost" id="download-brief" disabled>Download .txt</button>
               <span class="brief-status" id="brief-status" aria-live="polite"></span>
             </div>
           </div>

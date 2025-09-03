@@ -1,5 +1,7 @@
 const chips = document.querySelectorAll(".chip");
-const cards = document.querySelectorAll(".vault-card");
+const vaultGrid = document.querySelector("#vault-grid");
+let cards = [];
+
 const selectionList = document.querySelector("#selection-list");
 const selectionCount = document.querySelector("#selection-count");
 const selectionHint = document.querySelector("#selection-hint");
@@ -7,9 +9,20 @@ const clearSelection = document.querySelector("#clear-selection");
 const balanceValues = document.querySelectorAll(".balance-value");
 const briefCallout = document.querySelector("#brief-callout");
 const briefOutput = document.querySelector("#brief-output");
+const briefDraft = document.querySelector("#brief-draft");
 const copyBrief = document.querySelector("#copy-brief");
 const downloadBrief = document.querySelector("#download-brief");
 const briefStatus = document.querySelector("#brief-status");
+
+const pulseUpdated = document.querySelector("#pulse-updated");
+const pulseActiveCount = document.querySelector("#pulse-active-count");
+const pulseActiveMeta = document.querySelector("#pulse-active-meta");
+const pulsePartnerConfidence = document.querySelector("#pulse-partner-confidence");
+const pulsePartnerMeta = document.querySelector("#pulse-partner-meta");
+const pulseOutcomeProof = document.querySelector("#pulse-outcome-proof");
+const pulseOutcomeMeta = document.querySelector("#pulse-outcome-meta");
+const pulseRiskCount = document.querySelector("#pulse-risk-count");
+const pulseRiskMeta = document.querySelector("#pulse-risk-meta");
 
 const selectedCards = new Map();
 
@@ -18,6 +31,116 @@ const categoryLabels = {
   partner: "Partner Readiness",
   impact: "Impact Proof",
   risk: "Risk Watch",
+};
+
+const fallbackSignals = [
+  {
+    id: "signal-1",
+    category: "scholar",
+    tag: "Scholar Journey",
+    title: "Retention lift after cohort mentoring pilot",
+    summary:
+      "Scholars in the peer-mentored cohort completed 1.8x more milestones with a 12% higher retention rate than control groups.",
+    owner: "Scholar Success",
+    evidence: "Survey + CRM",
+    timeLabel: "2 days ago",
+  },
+  {
+    id: "signal-2",
+    category: "partner",
+    tag: "Partner Readiness",
+    title: "Employer partners ready for spring placement surge",
+    summary:
+      "9 partners have confirmed placement slots with onboarding assets delivered and hiring managers trained on support standards.",
+    owner: "Partnerships",
+    evidence: "Partner CRM",
+    timeLabel: "3 days ago",
+  },
+  {
+    id: "signal-3",
+    category: "impact",
+    tag: "Impact Proof",
+    title: "First-gen graduation outcomes verified",
+    summary:
+      "17 scholars officially crossed graduation milestones, with 11 landing in roles aligned to their declared pathways.",
+    owner: "Impact",
+    evidence: "Institutional records",
+    timeLabel: "4 days ago",
+  },
+  {
+    id: "signal-4",
+    category: "risk",
+    tag: "Risk Watch",
+    title: "Financial aid gaps emerging for two campuses",
+    summary:
+      "Aid offices report delayed award packaging; recommend targeted outreach and bridge funding contingency planning.",
+    owner: "Operations",
+    evidence: "Campus reports",
+    timeLabel: "Yesterday",
+  },
+  {
+    id: "signal-5",
+    category: "impact",
+    tag: "Impact Proof",
+    title: "Scholar leadership pipeline hits 80% participation",
+    summary:
+      "Leadership programming participation increased after introducing micro-credentialing and alumni storytelling sessions.",
+    owner: "Programs",
+    evidence: "Attendance + LMS",
+    timeLabel: "5 days ago",
+  },
+  {
+    id: "signal-6",
+    category: "scholar",
+    tag: "Scholar Journey",
+    title: "Well-being check-ins signal higher stress in finals window",
+    summary:
+      "Mental health touchpoints show a 22% increase in stress markers; deploy finals week support plan and advisor staffing.",
+    owner: "Care Team",
+    evidence: "Check-in dashboard",
+    timeLabel: "6 days ago",
+  },
+];
+
+const fallbackPulse = {
+  snapshotDate: new Date().toISOString().slice(0, 10),
+  activeScholars: 482,
+  activeChange: 0.06,
+  partnerConfidence: 92,
+  partnerOnTrack: 14,
+  outcomeProof: 38,
+  nextRisks: 3,
+};
+
+const formatBriefDate = () =>
+  new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+const formatPulseUpdated = (value) => {
+  if (!value) {
+    return "Updated today";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Updated today";
+  }
+  const now = new Date();
+  const diffMs = now.setHours(0, 0, 0, 0) - date.setHours(0, 0, 0, 0);
+  const diffDays = Math.round(diffMs / 86400000);
+  if (diffDays <= 0) {
+    return "Updated today";
+  }
+  if (diffDays === 1) {
+    return "Updated yesterday";
+  }
+  return `Updated ${date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  })}`;
 };
 
 const getCounts = () => {
@@ -36,12 +159,39 @@ const setActive = (selected) => {
   });
 };
 
+const getActiveFilter = () =>
+  document.querySelector(".chip.active")?.dataset.filter || "all";
+
+const updateVaultEmptyState = (visibleCount) => {
+  if (!vaultGrid) {
+    return;
+  }
+  const existing = vaultGrid.querySelector(".vault-empty");
+  if (visibleCount > 0) {
+    if (existing) {
+      existing.remove();
+    }
+    return;
+  }
+  if (!existing) {
+    const empty = document.createElement("div");
+    empty.className = "vault-empty";
+    empty.textContent = "No signals match this filter yet.";
+    vaultGrid.appendChild(empty);
+  }
+};
+
 const filterCards = (filter) => {
+  let visible = 0;
   cards.forEach((card) => {
     const category = card.dataset.category;
     const show = filter === "all" || filter === category;
     card.style.display = show ? "block" : "none";
+    if (show) {
+      visible += 1;
+    }
   });
+  updateVaultEmptyState(visible);
 };
 
 const buildSelectionItem = (entry) => {
@@ -95,7 +245,9 @@ const updateBalance = () => {
 
   if (total < 3) {
     const remaining = 3 - total;
-    briefCallout.textContent = `Add ${remaining} more signal${remaining === 1 ? "" : "s"} to reach a full brief.`;
+    briefCallout.textContent = `Add ${remaining} more signal${
+      remaining === 1 ? "" : "s"
+    } to reach a full brief.`;
     selectionHint.textContent = "Build toward at least three signals";
     return;
   }
@@ -117,14 +269,6 @@ const updateBalance = () => {
   briefCallout.textContent = "Brief pack ready. Share with leadership and partners.";
   selectionHint.textContent = "Balanced coverage achieved";
 };
-
-const formatBriefDate = () =>
-  new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
 
 const buildBriefText = () => {
   const total = selectedCards.size;
@@ -155,14 +299,27 @@ const buildBriefText = () => {
   return lines.join("\n");
 };
 
+const setBriefActions = () => {
+  const hasSelection = selectedCards.size > 0;
+  if (copyBrief) {
+    copyBrief.disabled = !hasSelection;
+  }
+  if (downloadBrief) {
+    downloadBrief.disabled = !hasSelection;
+  }
+};
+
 const updateBriefOutput = () => {
-  if (!briefOutput) {
-    return;
+  const text = buildBriefText();
+  if (briefOutput) {
+    if (briefStatus) {
+      briefStatus.textContent = "";
+    }
+    briefOutput.value = text;
   }
-  if (briefStatus) {
-    briefStatus.textContent = "";
+  if (briefDraft) {
+    briefDraft.textContent = text;
   }
-  briefOutput.value = buildBriefText();
 };
 
 const updateSelectionList = () => {
@@ -176,6 +333,7 @@ const updateSelectionList = () => {
     selectionCount.textContent = "0";
     updateBalance();
     updateBriefOutput();
+    setBriefActions();
     return;
   }
 
@@ -186,6 +344,7 @@ const updateSelectionList = () => {
   selectionCount.textContent = String(selectedCards.size);
   updateBalance();
   updateBriefOutput();
+  setBriefActions();
 };
 
 const toggleSelection = (card) => {
@@ -215,23 +374,157 @@ const toggleSelection = (card) => {
   updateSelectionList();
 };
 
+const attachCardEvents = () => {
+  cards.forEach((card) => {
+    const toggle = () => toggleSelection(card);
+
+    card.addEventListener("click", toggle);
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggle();
+      }
+    });
+  });
+};
+
+const renderSignals = (signals) => {
+  if (!vaultGrid) {
+    return;
+  }
+
+  vaultGrid.innerHTML = "";
+
+  if (!signals.length) {
+    const empty = document.createElement("div");
+    empty.className = "vault-empty";
+    empty.textContent = "No signals available yet.";
+    vaultGrid.appendChild(empty);
+    cards = [];
+    updateSelectionList();
+    return;
+  }
+
+  signals.forEach((signal) => {
+    const card = document.createElement("article");
+    card.className = "vault-card";
+    card.dataset.id = signal.id;
+    card.dataset.category = signal.category;
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-pressed", "false");
+
+    const top = document.createElement("div");
+    top.className = "card-top";
+
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = signal.tag;
+
+    const time = document.createElement("span");
+    time.className = "time";
+    time.textContent = signal.timeLabel || "Updated";
+
+    top.appendChild(tag);
+    top.appendChild(time);
+
+    const title = document.createElement("h3");
+    title.textContent = signal.title;
+
+    const summary = document.createElement("p");
+    summary.textContent = signal.summary;
+
+    const meta = document.createElement("div");
+    meta.className = "card-meta";
+    meta.textContent = `Owner: ${signal.owner} · Evidence: ${signal.evidence}`;
+
+    card.appendChild(top);
+    card.appendChild(title);
+    card.appendChild(summary);
+    card.appendChild(meta);
+
+    vaultGrid.appendChild(card);
+  });
+
+  cards = Array.from(document.querySelectorAll(".vault-card"));
+  attachCardEvents();
+  filterCards(getActiveFilter());
+  updateSelectionList();
+};
+
+const loadSignals = async () => {
+  if (!vaultGrid) {
+    return;
+  }
+
+  vaultGrid.innerHTML = '<div class="vault-loading">Loading live signals...</div>';
+
+  let signals = fallbackSignals;
+  try {
+    const response = await fetch("/api/signals");
+    if (response.ok) {
+      const payload = await response.json();
+      if (payload.signals?.length) {
+        signals = payload.signals;
+      }
+    }
+  } catch (error) {
+    // Fall back to local data.
+  }
+
+  renderSignals(signals);
+};
+
+const loadPulse = async () => {
+  let pulse = fallbackPulse;
+  try {
+    const response = await fetch("/api/pulse");
+    if (response.ok) {
+      const payload = await response.json();
+      if (payload.pulse) {
+        pulse = payload.pulse;
+      }
+    }
+  } catch (error) {
+    // Keep fallback values.
+  }
+
+  if (pulseUpdated) {
+    pulseUpdated.textContent = formatPulseUpdated(pulse.snapshotDate);
+  }
+  if (pulseActiveCount) {
+    pulseActiveCount.textContent = String(pulse.activeScholars);
+  }
+  if (pulseActiveMeta) {
+    const change = Math.round(pulse.activeChange * 100);
+    pulseActiveMeta.textContent = `${change >= 0 ? "+" : ""}${change}% month-over-month`;
+  }
+  if (pulsePartnerConfidence) {
+    pulsePartnerConfidence.textContent = `${pulse.partnerConfidence}%`;
+  }
+  if (pulsePartnerMeta) {
+    pulsePartnerMeta.textContent = `${pulse.partnerOnTrack} partners on track`;
+  }
+  if (pulseOutcomeProof) {
+    pulseOutcomeProof.textContent = String(pulse.outcomeProof);
+  }
+  if (pulseOutcomeMeta) {
+    pulseOutcomeMeta.textContent = "Verified milestones";
+  }
+  if (pulseRiskCount) {
+    pulseRiskCount.textContent = String(pulse.nextRisks);
+  }
+  if (pulseRiskMeta) {
+    pulseRiskMeta.textContent =
+      pulse.nextRisks === 0 ? "No escalations pending" : `${pulse.nextRisks} escalations pending`;
+  }
+};
+
 chips.forEach((chip) => {
   chip.addEventListener("click", () => {
     const filter = chip.dataset.filter;
     setActive(chip);
     filterCards(filter);
-  });
-});
-
-cards.forEach((card) => {
-  const toggle = () => toggleSelection(card);
-
-  card.addEventListener("click", toggle);
-  card.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      toggle();
-    }
   });
 });
 
@@ -285,4 +578,6 @@ downloadBrief?.addEventListener("click", () => {
   }
 });
 
+loadSignals();
+loadPulse();
 updateSelectionList();
