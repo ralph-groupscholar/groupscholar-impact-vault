@@ -60,3 +60,8 @@
 - Connected Impact Vault to the Group Scholar PostgreSQL database with API endpoints for pulse metrics and signal cards.
 - Rebuilt the signal library to load live data with fallback seeds, filter-aware empty states, and updated brief export actions.
 - Added database schema + seed script for signals and pulse snapshots, and configured Vercel env vars (deploy blocked by daily limit).
+
+## Iteration 8 - 2026-02-08 09:14:32 EST
+- Added live sync metadata to the signals API (total count + last sync) for dashboard transparency.
+- Wired the insight library refresh button with loading states, status messaging, and synced count updates.
+- Preserved signal selections across live reloads to keep the brief composer stable.

@@ -1,5 +1,9 @@
 const chips = document.querySelectorAll(".chip");
 const vaultGrid = document.querySelector("#vault-grid");
+const vaultCount = document.querySelector("#vault-count");
+const vaultUpdated = document.querySelector("#vault-updated");
+const vaultStatus = document.querySelector("#vault-status");
+const refreshSignals = document.querySelector("#refresh-signals");
 let cards = [];
 
 const selectionList = document.querySelector("#selection-list");
@@ -141,6 +145,44 @@ const formatPulseUpdated = (value) => {
     month: "short",
     day: "numeric",
   })}`;
+};
+
+const formatVaultUpdated = (value) => {
+  if (!value) {
+    return "Last sync: Today";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Last sync: Today";
+  }
+  const now = new Date();
+  const diffMs = now.setHours(0, 0, 0, 0) - date.setHours(0, 0, 0, 0);
+  const diffDays = Math.round(diffMs / 86400000);
+  if (diffDays <= 0) {
+    return "Last sync: Today";
+  }
+  if (diffDays === 1) {
+    return "Last sync: Yesterday";
+  }
+  return `Last sync: ${date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  })}`;
+};
+
+const updateVaultMeta = ({ signals, meta, usedFallback }) => {
+  if (vaultCount) {
+    const total = meta?.total || signals.length;
+    vaultCount.textContent = `${total} signals`;
+  }
+  if (vaultUpdated) {
+    vaultUpdated.textContent = formatVaultUpdated(meta?.lastSync || new Date());
+  }
+  if (vaultStatus) {
+    vaultStatus.textContent = usedFallback
+      ? "Showing cached signals. Live sync unavailable."
+      : `Live sync complete. ${signals.length} signals loaded.`;
+  }
 };
 
 const getCounts = () => {
@@ -443,6 +485,13 @@ const renderSignals = (signals) => {
     card.appendChild(summary);
     card.appendChild(meta);
 
+    const existing = selectedCards.get(signal.id);
+    if (existing) {
+      existing.card = card;
+      card.classList.add("selected");
+      card.setAttribute("aria-pressed", "true");
+    }
+
     vaultGrid.appendChild(card);
   });
 
@@ -452,20 +501,30 @@ const renderSignals = (signals) => {
   updateSelectionList();
 };
 
-const loadSignals = async () => {
+const loadSignals = async ({ isRefresh = false } = {}) => {
   if (!vaultGrid) {
     return;
   }
 
+  if (refreshSignals) {
+    refreshSignals.disabled = true;
+  }
+  if (vaultStatus) {
+    vaultStatus.textContent = isRefresh ? "Refreshing live signals..." : "Loading live signals…";
+  }
   vaultGrid.innerHTML = '<div class="vault-loading">Loading live signals...</div>';
 
   let signals = fallbackSignals;
+  let meta = { total: fallbackSignals.length, lastSync: new Date().toISOString() };
+  let usedFallback = true;
   try {
     const response = await fetch("/api/signals");
     if (response.ok) {
       const payload = await response.json();
       if (payload.signals?.length) {
         signals = payload.signals;
+        meta = payload.meta || meta;
+        usedFallback = false;
       }
     }
   } catch (error) {
@@ -473,6 +532,10 @@ const loadSignals = async () => {
   }
 
   renderSignals(signals);
+  updateVaultMeta({ signals, meta, usedFallback });
+  if (refreshSignals) {
+    refreshSignals.disabled = false;
+  }
 };
 
 const loadPulse = async () => {
@@ -535,6 +598,10 @@ clearSelection?.addEventListener("click", () => {
     card.setAttribute("aria-pressed", "false");
   });
   updateSelectionList();
+});
+
+refreshSignals?.addEventListener("click", () => {
+  loadSignals({ isRefresh: true });
 });
 
 copyBrief?.addEventListener("click", async () => {
