@@ -485,6 +485,42 @@ main {
   gap: 16px;
 }
 
+.brief-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(16, 20, 24, 0.04);
+}
+
+.brief-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.brief-field input {
+  border-radius: 12px;
+  border: 1px solid rgba(16, 20, 24, 0.12);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+  background: #fff;
+}
+
+.brief-field input:focus {
+  outline: 2px solid rgba(242, 107, 58, 0.35);
+  border-color: var(--accent);
+}
+
 .brief-output {
   width: 100%;
   min-height: 220px;
@@ -513,6 +549,77 @@ main {
 .brief-status {
   font-size: 13px;
   color: var(--muted);
+}
+
+.brief-archive {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.archive-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.archive-status {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.archive-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 16px 32px rgba(16, 20, 24, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.archive-card.placeholder {
+  background: rgba(15, 59, 87, 0.05);
+  border: 1px dashed rgba(15, 59, 87, 0.2);
+  box-shadow: none;
+}
+
+.archive-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.archive-meta {
+  margin: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.archive-cover {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.archive-chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(242, 107, 58, 0.12);
+  color: var(--accent-deep);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  text-align: center;
 }
 
 .coverage {

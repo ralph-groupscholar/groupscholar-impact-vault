@@ -434,12 +434,55 @@
                 <p>Copy or download the weekly pack in one click.</p>
               </div>
             </div>
+            <div class="brief-form">
+              <label class="brief-field" for="brief-title">
+                <span>Brief title</span>
+                <input
+                  id="brief-title"
+                  type="text"
+                  placeholder="Impact Brief — Week of"
+                  autocomplete="off"
+                />
+              </label>
+              <label class="brief-field" for="brief-owner">
+                <span>Brief owner</span>
+                <input
+                  id="brief-owner"
+                  type="text"
+                  placeholder="Impact Ops"
+                  autocomplete="off"
+                />
+              </label>
+            </div>
             <textarea id="brief-output" class="brief-output" rows="10" readonly></textarea>
             <div class="brief-actions">
               <button class="solid" id="copy-brief" disabled>Copy brief</button>
               <button class="ghost" id="download-brief" disabled>Download .txt</button>
+              <button class="ghost" id="save-brief" disabled>Save to vault</button>
               <span class="brief-status" id="brief-status" aria-live="polite"></span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="brief-archive">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Brief Archive</p>
+            <h2>Track the last saved briefs and their signal coverage.</h2>
+            <p class="lede">
+              Store weekly packs to keep leadership follow-ups, donor updates, and partner check-ins
+              aligned.
+            </p>
+          </div>
+          <div class="archive-meta-row">
+            <span class="archive-status" id="brief-archive-status">Loading archive…</span>
+          </div>
+        </div>
+        <div class="archive-grid" id="brief-archive-list">
+          <div class="archive-card placeholder">
+            <p class="archive-title">No briefs saved yet.</p>
+            <p class="archive-meta">Save your first brief to build the weekly record.</p>
           </div>
         </div>
       </section>

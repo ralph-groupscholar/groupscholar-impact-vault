@@ -100,6 +100,38 @@ const pulse = {
   next_risks: 3,
 };
 
+const briefSamples = [
+  {
+    brief_id: "brief-001",
+    title: "Impact Brief — Early February",
+    owner: "Impact Ops",
+    narrative:
+      "Impact Brief — Early February\nOwner: Impact Ops\nSignals selected: 4\nBalance: Scholar 1 | Partner 1 | Impact 1 | Risk 1\n\nHighlights:\n- [Scholar Journey] Retention lift after cohort mentoring pilot\n- [Partner Readiness] Employer partners ready for spring placement surge\n- [Impact Proof] First-gen graduation outcomes verified\n- [Risk Watch] Financial aid gaps emerging for two campuses\n\nNarrative guidance: Brief pack ready. Share with leadership and partners.",
+    selections: [
+      { id: "signal-1", title: "Retention lift after cohort mentoring pilot", category: "scholar" },
+      { id: "signal-2", title: "Employer partners ready for spring placement surge", category: "partner" },
+      { id: "signal-3", title: "First-gen graduation outcomes verified", category: "impact" },
+      { id: "signal-4", title: "Financial aid gaps emerging for two campuses", category: "risk" },
+    ],
+    counts: { scholar: 1, partner: 1, impact: 1, risk: 1 },
+    created_at: "NOW() - INTERVAL '3 days'",
+  },
+  {
+    brief_id: "brief-002",
+    title: "Impact Brief — Placement Readiness",
+    owner: "Scholar Success",
+    narrative:
+      "Impact Brief — Placement Readiness\nOwner: Scholar Success\nSignals selected: 3\nBalance: Scholar 1 | Partner 1 | Impact 1 | Risk 0\n\nHighlights:\n- [Scholar Journey] Well-being check-ins signal higher stress in finals window\n- [Partner Readiness] Employer partners ready for spring placement surge\n- [Impact Proof] Scholar leadership pipeline hits 80% participation\n\nNarrative guidance: Consider adding risk watch to balance the story.",
+    selections: [
+      { id: "signal-6", title: "Well-being check-ins signal higher stress in finals window", category: "scholar" },
+      { id: "signal-2", title: "Employer partners ready for spring placement surge", category: "partner" },
+      { id: "signal-5", title: "Scholar leadership pipeline hits 80% participation", category: "impact" },
+    ],
+    counts: { scholar: 1, partner: 1, impact: 1, risk: 0 },
+    created_at: "NOW() - INTERVAL '1 day'",
+  },
+];
+
 const run = async () => {
   const client = new Client({
     connectionString,
@@ -135,6 +167,18 @@ const run = async () => {
         outcome_proof INTEGER NOT NULL,
         next_risks INTEGER NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS impact_vault.briefs (
+        id SERIAL PRIMARY KEY,
+        brief_id TEXT UNIQUE NOT NULL,
+        title TEXT NOT NULL,
+        owner TEXT NOT NULL,
+        narrative TEXT NOT NULL,
+        selections JSONB NOT NULL,
+        counts JSONB NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `);
 
@@ -195,6 +239,33 @@ const run = async () => {
         pulse.next_risks,
       ]
     );
+
+    for (const brief of briefSamples) {
+      await client.query(
+        `
+        INSERT INTO impact_vault.briefs
+          (brief_id, title, owner, narrative, selections, counts, created_at)
+        VALUES
+          ($1, $2, $3, $4, $5::jsonb, $6::jsonb, ${brief.created_at})
+        ON CONFLICT (brief_id)
+        DO UPDATE SET
+          title = EXCLUDED.title,
+          owner = EXCLUDED.owner,
+          narrative = EXCLUDED.narrative,
+          selections = EXCLUDED.selections,
+          counts = EXCLUDED.counts,
+          created_at = EXCLUDED.created_at;
+        `,
+        [
+          brief.brief_id,
+          brief.title,
+          brief.owner,
+          brief.narrative,
+          JSON.stringify(brief.selections),
+          JSON.stringify(brief.counts),
+        ]
+      );
+    }
 
     console.log("Impact Vault seed complete.");
   } finally {

@@ -16,7 +16,13 @@ const briefOutput = document.querySelector("#brief-output");
 const briefDraft = document.querySelector("#brief-draft");
 const copyBrief = document.querySelector("#copy-brief");
 const downloadBrief = document.querySelector("#download-brief");
+const saveBrief = document.querySelector("#save-brief");
 const briefStatus = document.querySelector("#brief-status");
+const briefTitleInput = document.querySelector("#brief-title");
+const briefOwnerInput = document.querySelector("#brief-owner");
+
+const briefArchiveList = document.querySelector("#brief-archive-list");
+const briefArchiveStatus = document.querySelector("#brief-archive-status");
 
 const pulseUpdated = document.querySelector("#pulse-updated");
 const pulseActiveCount = document.querySelector("#pulse-active-count");
@@ -123,6 +129,16 @@ const formatBriefDate = () =>
     month: "long",
     day: "numeric",
   });
+
+const getBriefTitle = () => {
+  const value = briefTitleInput?.value?.trim();
+  return value || `Group Scholar Impact Brief — ${formatBriefDate()}`;
+};
+
+const getBriefOwner = () => {
+  const value = briefOwnerInput?.value?.trim();
+  return value || "Impact Ops";
+};
 
 const formatPulseUpdated = (value) => {
   if (!value) {
@@ -317,7 +333,8 @@ const buildBriefText = () => {
   const counts = getCounts();
   const lines = [];
 
-  lines.push(`Group Scholar Impact Brief — ${formatBriefDate()}`);
+  lines.push(getBriefTitle());
+  lines.push(`Owner: ${getBriefOwner()}`);
   lines.push(`Signals selected: ${total}`);
   lines.push(
     `Balance: Scholar ${counts.scholar} | Partner ${counts.partner} | Impact ${counts.impact} | Risk ${counts.risk}`
@@ -349,6 +366,9 @@ const setBriefActions = () => {
   if (downloadBrief) {
     downloadBrief.disabled = !hasSelection;
   }
+  if (saveBrief) {
+    saveBrief.disabled = !hasSelection;
+  }
 };
 
 const updateBriefOutput = () => {
@@ -361,6 +381,79 @@ const updateBriefOutput = () => {
   }
   if (briefDraft) {
     briefDraft.textContent = text;
+  }
+};
+
+const buildArchiveCard = (brief) => {
+  const card = document.createElement("article");
+  card.className = "archive-card";
+
+  const title = document.createElement("p");
+  title.className = "archive-title";
+  title.textContent = brief.title || "Impact Brief";
+
+  const meta = document.createElement("p");
+  meta.className = "archive-meta";
+  meta.textContent = `${brief.owner || "Impact Ops"} · ${brief.dateLabel || "Saved"}`;
+
+  const summary = document.createElement("p");
+  summary.className = "archive-meta";
+  summary.textContent = `${brief.total} signals · ${brief.balance}`;
+
+  const cover = document.createElement("div");
+  cover.className = "archive-cover";
+  brief.coverage.forEach((item) => {
+    const chip = document.createElement("span");
+    chip.className = "archive-chip";
+    chip.textContent = item;
+    cover.appendChild(chip);
+  });
+
+  card.appendChild(title);
+  card.appendChild(meta);
+  card.appendChild(summary);
+  card.appendChild(cover);
+  return card;
+};
+
+const renderArchive = (briefs) => {
+  if (!briefArchiveList) {
+    return;
+  }
+  briefArchiveList.innerHTML = "";
+
+  if (!briefs.length) {
+    const empty = document.createElement("div");
+    empty.className = "archive-card placeholder";
+    empty.innerHTML = `\n      <p class="archive-title">No briefs saved yet.</p>\n      <p class="archive-meta">Save your first brief to build the weekly record.</p>\n    `;
+    briefArchiveList.appendChild(empty);
+    return;
+  }
+
+  briefs.forEach((brief) => {
+    briefArchiveList.appendChild(buildArchiveCard(brief));
+  });
+};
+
+const loadArchive = async () => {
+  if (briefArchiveStatus) {
+    briefArchiveStatus.textContent = "Loading archive…";
+  }
+  let briefs = [];
+  try {
+    const response = await fetch("/api/briefs");
+    if (response.ok) {
+      const payload = await response.json();
+      briefs = payload.briefs || [];
+    }
+  } catch (error) {
+    // Keep empty.
+  }
+
+  renderArchive(briefs);
+  if (briefArchiveStatus) {
+    briefArchiveStatus.textContent =
+      briefs.length > 0 ? `Last saved: ${briefs[0].dateLabel}` : "No briefs saved yet.";
   }
 };
 
@@ -604,6 +697,14 @@ refreshSignals?.addEventListener("click", () => {
   loadSignals({ isRefresh: true });
 });
 
+briefTitleInput?.addEventListener("input", () => {
+  updateBriefOutput();
+});
+
+briefOwnerInput?.addEventListener("input", () => {
+  updateBriefOutput();
+});
+
 copyBrief?.addEventListener("click", async () => {
   if (!briefOutput) {
     return;
@@ -645,6 +746,55 @@ downloadBrief?.addEventListener("click", () => {
   }
 });
 
+saveBrief?.addEventListener("click", async () => {
+  if (!briefOutput) {
+    return;
+  }
+  if (saveBrief) {
+    saveBrief.disabled = true;
+  }
+  if (briefStatus) {
+    briefStatus.textContent = "Saving brief to vault…";
+  }
+
+  const counts = getCounts();
+  const selections = Array.from(selectedCards.values()).map((entry) => ({
+    id: entry.id,
+    title: entry.title,
+    category: entry.category,
+    meta: entry.meta,
+    tag: entry.tag,
+  }));
+
+  try {
+    const response = await fetch("/api/briefs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: getBriefTitle(),
+        owner: getBriefOwner(),
+        narrative: briefOutput.value,
+        selections,
+        counts,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error("Save failed");
+    }
+    if (briefStatus) {
+      briefStatus.textContent = "Brief saved. Archive updated.";
+    }
+    await loadArchive();
+  } catch (error) {
+    if (briefStatus) {
+      briefStatus.textContent = "Save failed. Try again.";
+    }
+  } finally {
+    setBriefActions();
+  }
+});
+
 loadSignals();
 loadPulse();
 updateSelectionList();
+loadArchive();

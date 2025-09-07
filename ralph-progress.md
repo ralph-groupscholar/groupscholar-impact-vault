@@ -51,6 +51,9 @@
 - Implemented copy + download actions so teams can move the brief into decks quickly.
 - Styled the export panel with a readable text preview and action row.
 
+## Iteration 7 - 2026-02-07 19:43:22 EST
+- Seeded the production Impact Vault database with live pulse metrics and signal records.
+
 ## Iteration 7 - 2026-02-07 19:40:27 EST
 - Wired the Insight Library to load live signals from the Impact Vault API with refresh support.
 - Added sync status messaging plus signal count and last-sync metadata to keep the feed transparent.
@@ -65,3 +68,8 @@
 - Added live sync metadata to the signals API (total count + last sync) for dashboard transparency.
 - Wired the insight library refresh button with loading states, status messaging, and synced count updates.
 - Preserved signal selections across live reloads to keep the brief composer stable.
+
+## Iteration 40 - 2026-02-08 10:12:08 EST
+- Added a Brief Archive section and UI controls to save briefing packs into the Impact Vault.
+- Built a new briefs API + database table to persist saved brief narratives with signal coverage stats.
+- Seeded production with sample briefs and wired live archive loading plus save-to-vault actions.
