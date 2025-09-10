@@ -73,3 +73,4 @@
 - Added a Brief Archive section and UI controls to save briefing packs into the Impact Vault.
 - Built a new briefs API + database table to persist saved brief narratives with signal coverage stats.
 - Seeded production with sample briefs and wired live archive loading plus save-to-vault actions.
+- Attempted Vercel production deploy; blocked by daily deployment limit.
