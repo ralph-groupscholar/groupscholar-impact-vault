@@ -132,6 +132,49 @@ const briefSamples = [
   },
 ];
 
+const escalationSamples = [
+  {
+    escalation_id: "escalation-001",
+    title: "Bridge funding approvals for two campuses",
+    summary:
+      "Aid packaging delays are extending beyond 10 days; temporary funding approvals needed to prevent stop-outs.",
+    owner: "Operations",
+    severity: "High",
+    status: "Open",
+    due_date: offsetDays(-3),
+  },
+  {
+    escalation_id: "escalation-002",
+    title: "Advisor coverage gap for finals week",
+    summary:
+      "Well-being check-ins show a 22% stress increase; deploy surge advisors and triage scripts.",
+    owner: "Scholar Success",
+    severity: "Medium",
+    status: "In Progress",
+    due_date: offsetDays(-1),
+  },
+  {
+    escalation_id: "escalation-003",
+    title: "Partner onboarding refresher for spring placements",
+    summary:
+      "Three employers need updated support playbooks before onboarding; coordinate training sessions.",
+    owner: "Partnerships",
+    severity: "Low",
+    status: "Watching",
+    due_date: offsetDays(-7),
+  },
+  {
+    escalation_id: "escalation-004",
+    title: "Scholar housing stability risk",
+    summary:
+      "Two cohorts flagged housing insecurity; coordinate emergency grants and community partners.",
+    owner: "Care Team",
+    severity: "High",
+    status: "Open",
+    due_date: offsetDays(-2),
+  },
+];
+
 const run = async () => {
   const client = new Client({
     connectionString,
@@ -179,6 +222,19 @@ const run = async () => {
         selections JSONB NOT NULL,
         counts JSONB NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS impact_vault.escalations (
+        id SERIAL PRIMARY KEY,
+        escalation_id TEXT UNIQUE NOT NULL,
+        title TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        owner TEXT NOT NULL,
+        severity TEXT NOT NULL,
+        status TEXT NOT NULL,
+        due_date DATE,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `);
 
@@ -263,6 +319,35 @@ const run = async () => {
           brief.narrative,
           JSON.stringify(brief.selections),
           JSON.stringify(brief.counts),
+        ]
+      );
+    }
+
+    for (const escalation of escalationSamples) {
+      await client.query(
+        `
+        INSERT INTO impact_vault.escalations
+          (escalation_id, title, summary, owner, severity, status, due_date)
+        VALUES
+          ($1, $2, $3, $4, $5, $6, $7)
+        ON CONFLICT (escalation_id)
+        DO UPDATE SET
+          title = EXCLUDED.title,
+          summary = EXCLUDED.summary,
+          owner = EXCLUDED.owner,
+          severity = EXCLUDED.severity,
+          status = EXCLUDED.status,
+          due_date = EXCLUDED.due_date,
+          updated_at = NOW();
+        `,
+        [
+          escalation.escalation_id,
+          escalation.title,
+          escalation.summary,
+          escalation.owner,
+          escalation.severity,
+          escalation.status,
+          escalation.due_date,
         ]
       );
     }

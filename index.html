@@ -273,7 +273,10 @@
           </div>
           <button class="ghost">Open Decision Log</button>
         </div>
-        <div class="decision-grid">
+        <div class="decision-meta-row">
+          <span class="decision-status" id="decision-status">Loading decision log…</span>
+        </div>
+        <div class="decision-grid" id="decision-grid">
           <article class="decision-card">
             <h3>Bridge fund approved for aid delays</h3>
             <p>
@@ -298,6 +301,31 @@
             </p>
             <div class="decision-meta">Owner: Partnerships · Due: Feb 28</div>
           </article>
+        </div>
+      </section>
+
+      <section class="escalations">
+        <div class="escalations-header">
+          <div>
+            <p class="eyebrow">Escalation Queue</p>
+            <h2>Track urgent scholar and partner risks with owners and due dates.</h2>
+            <p class="lede">
+              Escalations roll up the most time-sensitive needs so the weekly brief stays action
+              oriented.
+            </p>
+          </div>
+          <div class="escalations-meta">
+            <span id="escalations-status">Loading escalation queue…</span>
+            <button class="ghost small" id="refresh-escalations" type="button">
+              Refresh queue
+            </button>
+          </div>
+        </div>
+        <div class="escalations-grid" id="escalations-grid">
+          <div class="escalation-card placeholder">
+            <p class="escalation-title">No escalations loaded yet.</p>
+            <p class="escalation-summary">Refresh the queue to see the latest urgent needs.</p>
+          </div>
         </div>
       </section>
 

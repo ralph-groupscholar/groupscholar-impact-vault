@@ -772,6 +772,119 @@ main {
   color: var(--muted);
 }
 
+.escalations {
+  background: #fff;
+  padding: 40px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 24px;
+}
+
+.escalations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+}
+
+.escalations-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.escalations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.escalation-card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 16px 34px rgba(16, 20, 24, 0.1);
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(15, 59, 87, 0.08);
+}
+
+.escalation-card.placeholder {
+  background: rgba(15, 59, 87, 0.05);
+  border: 1px dashed rgba(15, 59, 87, 0.2);
+  box-shadow: none;
+}
+
+.escalation-card.severity-high {
+  border-color: rgba(242, 107, 58, 0.45);
+  box-shadow: 0 20px 40px rgba(242, 107, 58, 0.18);
+}
+
+.escalation-card.severity-medium {
+  border-color: rgba(15, 59, 87, 0.25);
+}
+
+.escalation-card.severity-low {
+  border-color: rgba(15, 59, 87, 0.12);
+}
+
+.escalation-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.escalation-title {
+  margin: 0;
+  font-size: 18px;
+  color: var(--ink);
+}
+
+.escalation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.escalation-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(242, 107, 58, 0.14);
+  color: var(--accent-deep);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.escalation-chip.subtle {
+  background: rgba(15, 59, 87, 0.12);
+  color: var(--ocean);
+}
+
+.escalation-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.escalation-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .voice {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -945,6 +1058,11 @@ main {
     align-items: flex-start;
   }
 
+  .escalations-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .momentum-header {
     flex-direction: column;
     align-items: flex-start;
@@ -975,6 +1093,10 @@ main {
   }
 
   .momentum {
+    padding: 28px;
+  }
+
+  .escalations {
     padding: 28px;
   }
 }

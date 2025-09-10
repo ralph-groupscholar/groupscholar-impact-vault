@@ -24,6 +24,10 @@ const briefOwnerInput = document.querySelector("#brief-owner");
 const briefArchiveList = document.querySelector("#brief-archive-list");
 const briefArchiveStatus = document.querySelector("#brief-archive-status");
 
+const escalationsGrid = document.querySelector("#escalations-grid");
+const escalationsStatus = document.querySelector("#escalations-status");
+const refreshEscalations = document.querySelector("#refresh-escalations");
+
 const pulseUpdated = document.querySelector("#pulse-updated");
 const pulseActiveCount = document.querySelector("#pulse-active-count");
 const pulseActiveMeta = document.querySelector("#pulse-active-meta");
@@ -122,6 +126,39 @@ const fallbackPulse = {
   nextRisks: 3,
 };
 
+const fallbackEscalations = [
+  {
+    id: "escalation-001",
+    title: "Bridge funding approvals for two campuses",
+    summary:
+      "Aid packaging delays are extending beyond 10 days; temporary funding approvals needed to prevent stop-outs.",
+    owner: "Operations",
+    severity: "High",
+    status: "Open",
+    dueLabel: "Due in 3 days",
+  },
+  {
+    id: "escalation-002",
+    title: "Advisor coverage gap for finals week",
+    summary:
+      "Well-being check-ins show a 22% stress increase; deploy surge advisors and triage scripts.",
+    owner: "Scholar Success",
+    severity: "Medium",
+    status: "In Progress",
+    dueLabel: "Due tomorrow",
+  },
+  {
+    id: "escalation-003",
+    title: "Partner onboarding refresher for spring placements",
+    summary:
+      "Three employers need updated support playbooks before onboarding; coordinate training sessions.",
+    owner: "Partnerships",
+    severity: "Low",
+    status: "Watching",
+    dueLabel: "Due in 1 week",
+  },
+];
+
 const formatBriefDate = () =>
   new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -198,6 +235,126 @@ const updateVaultMeta = ({ signals, meta, usedFallback }) => {
     vaultStatus.textContent = usedFallback
       ? "Showing cached signals. Live sync unavailable."
       : `Live sync complete. ${signals.length} signals loaded.`;
+  }
+};
+
+const formatEscalationStatus = (value) => {
+  if (!value) {
+    return "Pending";
+  }
+  return value;
+};
+
+const buildEscalationCard = (escalation) => {
+  const card = document.createElement("article");
+  card.className = "escalation-card";
+
+  const severity = (escalation.severity || "Medium").toLowerCase();
+  card.classList.add(`severity-${severity}`);
+
+  const header = document.createElement("div");
+  header.className = "escalation-header";
+
+  const title = document.createElement("h3");
+  title.className = "escalation-title";
+  title.textContent = escalation.title || "Escalation";
+
+  const meta = document.createElement("div");
+  meta.className = "escalation-meta";
+
+  const severityChip = document.createElement("span");
+  severityChip.className = "escalation-chip";
+  severityChip.textContent = escalation.severity || "Medium";
+
+  const statusChip = document.createElement("span");
+  statusChip.className = "escalation-chip subtle";
+  statusChip.textContent = formatEscalationStatus(escalation.status);
+
+  meta.appendChild(severityChip);
+  meta.appendChild(statusChip);
+
+  header.appendChild(title);
+  header.appendChild(meta);
+
+  const summary = document.createElement("p");
+  summary.className = "escalation-summary";
+  summary.textContent = escalation.summary || "Details pending.";
+
+  const footer = document.createElement("div");
+  footer.className = "escalation-footer";
+
+  const owner = document.createElement("span");
+  owner.textContent = `Owner: ${escalation.owner || "Impact Ops"}`;
+
+  const due = document.createElement("span");
+  due.textContent = escalation.dueLabel || "Due soon";
+
+  footer.appendChild(owner);
+  footer.appendChild(due);
+
+  card.appendChild(header);
+  card.appendChild(summary);
+  card.appendChild(footer);
+
+  return card;
+};
+
+const renderEscalations = (escalations) => {
+  if (!escalationsGrid) {
+    return;
+  }
+  escalationsGrid.innerHTML = "";
+
+  if (!escalations.length) {
+    const empty = document.createElement("div");
+    empty.className = "escalation-card placeholder";
+    empty.innerHTML =
+      "<p class=\"escalation-title\">No escalations active.</p><p class=\"escalation-summary\">Use the vault to log new urgent needs.</p>";
+    escalationsGrid.appendChild(empty);
+    return;
+  }
+
+  escalations.forEach((escalation) => {
+    escalationsGrid.appendChild(buildEscalationCard(escalation));
+  });
+};
+
+const loadEscalations = async ({ isRefresh = false } = {}) => {
+  if (!escalationsGrid) {
+    return;
+  }
+  if (refreshEscalations) {
+    refreshEscalations.disabled = true;
+  }
+  if (escalationsStatus) {
+    escalationsStatus.textContent = isRefresh
+      ? "Refreshing escalation queue..."
+      : "Loading escalation queue…";
+  }
+
+  let escalations = fallbackEscalations;
+  let usedFallback = true;
+  try {
+    const response = await fetch("/api/escalations");
+    if (response.ok) {
+      const payload = await response.json();
+      if (payload.escalations?.length) {
+        escalations = payload.escalations;
+        usedFallback = false;
+      }
+    }
+  } catch (error) {
+    // Keep fallback data.
+  }
+
+  renderEscalations(escalations);
+  if (escalationsStatus) {
+    escalationsStatus.textContent = usedFallback
+      ? "Showing cached escalations. Live sync unavailable."
+      : `Live queue synced. ${escalations.length} escalations loaded.`;
+  }
+  if (refreshEscalations) {
+    refreshEscalations.disabled = false;
   }
 };
 
@@ -697,6 +854,10 @@ refreshSignals?.addEventListener("click", () => {
   loadSignals({ isRefresh: true });
 });
 
+refreshEscalations?.addEventListener("click", () => {
+  loadEscalations({ isRefresh: true });
+});
+
 briefTitleInput?.addEventListener("input", () => {
   updateBriefOutput();
 });
@@ -798,3 +959,4 @@ loadSignals();
 loadPulse();
 updateSelectionList();
 loadArchive();
+loadEscalations();
