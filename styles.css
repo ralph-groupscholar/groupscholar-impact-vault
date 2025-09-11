@@ -798,6 +798,22 @@ main {
   justify-content: flex-end;
 }
 
+.meta-pill {
+  background: rgba(15, 59, 87, 0.08);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.meta-pill.subtle {
+  background: rgba(15, 59, 87, 0.05);
+  color: var(--muted);
+  font-weight: 500;
+}
+
 .escalations-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

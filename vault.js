@@ -24,9 +24,14 @@ const briefOwnerInput = document.querySelector("#brief-owner");
 const briefArchiveList = document.querySelector("#brief-archive-list");
 const briefArchiveStatus = document.querySelector("#brief-archive-status");
 
+const decisionGrid = document.querySelector("#decision-grid");
+const decisionStatus = document.querySelector("#decision-status");
+
 const escalationsGrid = document.querySelector("#escalations-grid");
 const escalationsStatus = document.querySelector("#escalations-status");
 const refreshEscalations = document.querySelector("#refresh-escalations");
+const escalationsCount = document.querySelector("#escalations-count");
+const escalationsUpdated = document.querySelector("#escalations-updated");
 
 const pulseUpdated = document.querySelector("#pulse-updated");
 const pulseActiveCount = document.querySelector("#pulse-active-count");
@@ -125,6 +130,39 @@ const fallbackPulse = {
   outcomeProof: 38,
   nextRisks: 3,
 };
+
+const fallbackDecisions = [
+  {
+    id: "decision-1",
+    title: "Bridge fund approved for aid delays",
+    summary:
+      "$48k released for two campuses, tied to weekly FAFSA packaging updates and a 14-day reforecast milestone.",
+    owner: "Finance + Ops",
+    dueDate: new Date(new Date().setDate(new Date().getDate() + 13)).toISOString().slice(0, 10),
+    status: "In progress",
+    priority: "High",
+  },
+  {
+    id: "decision-2",
+    title: "Advisor surge coverage for finals week",
+    summary:
+      "Temporary support added to reduce wait time below 24 hours and stabilize well-being check-ins during high stress windows.",
+    owner: "Scholar Success",
+    dueDate: new Date(new Date().setDate(new Date().getDate() + 6)).toISOString().slice(0, 10),
+    status: "Active",
+    priority: "Medium",
+  },
+  {
+    id: "decision-3",
+    title: "Partner onboarding refresh sprint",
+    summary:
+      "Training modules refreshed with support standards, escalation paths, and new mentoring expectations for spring placements.",
+    owner: "Partnerships",
+    dueDate: new Date(new Date().setDate(new Date().getDate() + 20)).toISOString().slice(0, 10),
+    status: "Scheduled",
+    priority: "Medium",
+  },
+];
 
 const fallbackEscalations = [
   {
@@ -245,6 +283,29 @@ const formatEscalationStatus = (value) => {
   return value;
 };
 
+const formatEscalationsUpdated = (value) => {
+  if (!value) {
+    return "Last sync: Today";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Last sync: Today";
+  }
+  const now = new Date();
+  const diffMs = now.setHours(0, 0, 0, 0) - date.setHours(0, 0, 0, 0);
+  const diffDays = Math.round(diffMs / 86400000);
+  if (diffDays <= 0) {
+    return "Last sync: Today";
+  }
+  if (diffDays === 1) {
+    return "Last sync: Yesterday";
+  }
+  return `Last sync: ${date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  })}`;
+};
+
 const buildEscalationCard = (escalation) => {
   const card = document.createElement("article");
   card.className = "escalation-card";
@@ -333,13 +394,15 @@ const loadEscalations = async ({ isRefresh = false } = {}) => {
   }
 
   let escalations = fallbackEscalations;
+  let meta = { total: fallbackEscalations.length, lastSync: new Date().toISOString() };
   let usedFallback = true;
   try {
     const response = await fetch("/api/escalations");
     if (response.ok) {
       const payload = await response.json();
-      if (payload.escalations?.length) {
+      if (Array.isArray(payload.escalations)) {
         escalations = payload.escalations;
+        meta = payload.meta || meta;
         usedFallback = false;
       }
     }
@@ -348,6 +411,13 @@ const loadEscalations = async ({ isRefresh = false } = {}) => {
   }
 
   renderEscalations(escalations);
+  if (escalationsCount) {
+    const total = meta?.total || escalations.length;
+    escalationsCount.textContent = `${total} escalations`;
+  }
+  if (escalationsUpdated) {
+    escalationsUpdated.textContent = formatEscalationsUpdated(meta?.lastSync);
+  }
   if (escalationsStatus) {
     escalationsStatus.textContent = usedFallback
       ? "Showing cached escalations. Live sync unavailable."

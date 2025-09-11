@@ -75,6 +75,11 @@
 - Seeded production with sample briefs and wired live archive loading plus save-to-vault actions.
 - Attempted Vercel production deploy; blocked by daily deployment limit.
 
+## Iteration 41 - 2026-02-07 22:02:06 EST
+- Added escalation queue metadata chips for total count and last sync visibility.
+- Wired escalation API meta into the dashboard and improved empty-state handling.
+- Styled new escalation meta pills to keep queue context readable at a glance.
+
 ## Iteration 41 - 2026-02-08 10:32:15 EST
 - Added an Escalation Queue section with live refresh controls and severity/status styling.
 - Built a new escalations API and database table with seed data for urgent risk tracking.
