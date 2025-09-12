@@ -261,6 +261,32 @@ const formatVaultUpdated = (value) => {
   })}`;
 };
 
+const formatDecisionDue = (value) => {
+  if (!value) {
+    return "No due date";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "No due date";
+  }
+  const now = new Date();
+  const diffMs = date.setHours(0, 0, 0, 0) - now.setHours(0, 0, 0, 0);
+  const diffDays = Math.round(diffMs / 86400000);
+  if (diffDays < 0) {
+    return `Overdue · ${date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    })}`;
+  }
+  if (diffDays === 0) {
+    return "Due today";
+  }
+  return `Due ${date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  })}`;
+};
+
 const updateVaultMeta = ({ signals, meta, usedFallback }) => {
   if (vaultCount) {
     const total = meta?.total || signals.length;
@@ -273,6 +299,80 @@ const updateVaultMeta = ({ signals, meta, usedFallback }) => {
     vaultStatus.textContent = usedFallback
       ? "Showing cached signals. Live sync unavailable."
       : `Live sync complete. ${signals.length} signals loaded.`;
+  }
+};
+
+const buildDecisionCard = (decision) => {
+  const card = document.createElement("article");
+  card.className = "decision-card";
+
+  const title = document.createElement("h3");
+  title.textContent = decision.title;
+
+  const summary = document.createElement("p");
+  summary.textContent = decision.summary;
+
+  const meta = document.createElement("div");
+  meta.className = "decision-meta";
+  const dueLabel = decision.dueLabel || formatDecisionDue(decision.dueDate);
+  const status = decision.status ? ` · ${decision.status}` : "";
+  const priority = decision.priority ? ` · ${decision.priority}` : "";
+  meta.textContent = `Owner: ${decision.owner || "Impact Ops"} · ${dueLabel}${status}${priority}`;
+
+  card.appendChild(title);
+  card.appendChild(summary);
+  card.appendChild(meta);
+
+  return card;
+};
+
+const renderDecisions = (decisions) => {
+  if (!decisionGrid) {
+    return;
+  }
+  decisionGrid.innerHTML = "";
+
+  if (!decisions.length) {
+    const empty = document.createElement("article");
+    empty.className = "decision-card placeholder";
+    empty.innerHTML = `
+      <h3>No leadership decisions logged yet.</h3>
+      <p>Capture approvals, asks, and owners to keep the impact brief accountable.</p>
+      <div class="decision-meta">Owner: Impact Ops · Due: Not scheduled</div>
+    `;
+    decisionGrid.appendChild(empty);
+    return;
+  }
+
+  decisions.forEach((decision) => {
+    decisionGrid.appendChild(buildDecisionCard(decision));
+  });
+};
+
+const loadDecisions = async () => {
+  if (decisionStatus) {
+    decisionStatus.textContent = "Loading decision log…";
+  }
+  let decisions = fallbackDecisions;
+  let usedFallback = true;
+  try {
+    const response = await fetch("/api/decisions");
+    if (response.ok) {
+      const payload = await response.json();
+      if (payload.decisions?.length) {
+        decisions = payload.decisions;
+        usedFallback = false;
+      }
+    }
+  } catch (error) {
+    // Keep fallback decisions.
+  }
+
+  renderDecisions(decisions);
+  if (decisionStatus) {
+    decisionStatus.textContent = usedFallback
+      ? "Showing cached decisions. Live sync unavailable."
+      : `Decision log updated · ${decisions.length} tracked`;
   }
 };
 
@@ -1029,4 +1129,5 @@ loadSignals();
 loadPulse();
 updateSelectionList();
 loadArchive();
+loadDecisions();
 loadEscalations();

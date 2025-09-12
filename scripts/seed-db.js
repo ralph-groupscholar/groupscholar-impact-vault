@@ -20,6 +20,11 @@ const offsetDays = (days) => {
   date.setDate(date.getDate() - days);
   return formatDate(date);
 };
+const forwardDays = (days) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return formatDate(date);
+};
 
 const signals = [
   {
@@ -175,6 +180,53 @@ const escalationSamples = [
   },
 ];
 
+const decisions = [
+  {
+    decision_id: "decision-001",
+    title: "Bridge fund approved for aid delays",
+    summary:
+      "$48k released for two campuses, tied to weekly FAFSA packaging updates and a 14-day reforecast milestone.",
+    owner: "Finance + Ops",
+    due_date: forwardDays(13),
+    status: "In progress",
+    priority: "High",
+    created_at: "NOW() - INTERVAL '2 days'",
+  },
+  {
+    decision_id: "decision-002",
+    title: "Advisor surge coverage for finals week",
+    summary:
+      "Temporary support added to reduce wait time below 24 hours and stabilize well-being check-ins during high stress windows.",
+    owner: "Scholar Success",
+    due_date: forwardDays(6),
+    status: "Active",
+    priority: "Medium",
+    created_at: "NOW() - INTERVAL '1 day'",
+  },
+  {
+    decision_id: "decision-003",
+    title: "Partner onboarding refresh sprint",
+    summary:
+      "Training modules refreshed with support standards, escalation paths, and new mentoring expectations for spring placements.",
+    owner: "Partnerships",
+    due_date: forwardDays(20),
+    status: "Scheduled",
+    priority: "Medium",
+    created_at: "NOW() - INTERVAL '3 days'",
+  },
+  {
+    decision_id: "decision-004",
+    title: "Impact evidence audit for board packet",
+    summary:
+      "Cross-check graduation outcomes and placement confirmations before the next board-ready briefing.",
+    owner: "Impact QA",
+    due_date: forwardDays(10),
+    status: "Queued",
+    priority: "High",
+    created_at: "NOW() - INTERVAL '4 days'",
+  },
+];
+
 const run = async () => {
   const client = new Client({
     connectionString,
@@ -221,6 +273,19 @@ const run = async () => {
         narrative TEXT NOT NULL,
         selections JSONB NOT NULL,
         counts JSONB NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS impact_vault.decisions (
+        id SERIAL PRIMARY KEY,
+        decision_id TEXT UNIQUE NOT NULL,
+        title TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        owner TEXT NOT NULL,
+        due_date DATE,
+        status TEXT NOT NULL,
+        priority TEXT NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `);
@@ -348,6 +413,35 @@ const run = async () => {
           escalation.severity,
           escalation.status,
           escalation.due_date,
+        ]
+      );
+    }
+
+    for (const decision of decisions) {
+      await client.query(
+        `
+        INSERT INTO impact_vault.decisions
+          (decision_id, title, summary, owner, due_date, status, priority, created_at)
+        VALUES
+          ($1, $2, $3, $4, $5, $6, $7, ${decision.created_at})
+        ON CONFLICT (decision_id)
+        DO UPDATE SET
+          title = EXCLUDED.title,
+          summary = EXCLUDED.summary,
+          owner = EXCLUDED.owner,
+          due_date = EXCLUDED.due_date,
+          status = EXCLUDED.status,
+          priority = EXCLUDED.priority,
+          created_at = EXCLUDED.created_at;
+        `,
+        [
+          decision.decision_id,
+          decision.title,
+          decision.summary,
+          decision.owner,
+          decision.due_date,
+          decision.status,
+          decision.priority,
         ]
       );
     }

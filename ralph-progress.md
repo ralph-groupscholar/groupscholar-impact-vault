@@ -75,6 +75,11 @@
 - Seeded production with sample briefs and wired live archive loading plus save-to-vault actions.
 - Attempted Vercel production deploy; blocked by daily deployment limit.
 
+## Iteration 41 - 2026-02-07 22:33:48 EST
+- Added a live Leadership Decisions log with API-backed decision cards and status messaging.
+- Created a new decisions table in the Impact Vault schema and seeded production with sample leadership actions.
+- Updated the decision section UI styling to support dynamic updates and empty-state handling.
+
 ## Iteration 41 - 2026-02-07 22:02:06 EST
 - Added escalation queue metadata chips for total count and last sync visibility.
 - Wired escalation API meta into the dashboard and improved empty-state handling.
