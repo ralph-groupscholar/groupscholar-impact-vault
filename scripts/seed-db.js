@@ -180,6 +180,69 @@ const escalationSamples = [
   },
 ];
 
+const evidenceSources = [
+  {
+    source_id: "evidence-001",
+    source_type: "Scholar CRM",
+    title: "Retention + completion dashboard",
+    summary:
+      "82% of scholars on pace to hit term milestones, with peer mentoring the top lift.",
+    owner: "Scholar Ops",
+    confidence: "High",
+    freshness_days: 2.4,
+    coverage_percent: 92,
+    updated_at: "NOW() - INTERVAL '3 hours'",
+  },
+  {
+    source_id: "evidence-002",
+    source_type: "Partner Pulse",
+    title: "Placement demand forecast",
+    summary:
+      "Hiring managers flagged 19 roles as ready, with onboarding support locked in.",
+    owner: "Partnerships",
+    confidence: "Medium",
+    freshness_days: 1.2,
+    coverage_percent: 88,
+    updated_at: "NOW() - INTERVAL '1 day'",
+  },
+  {
+    source_id: "evidence-003",
+    source_type: "Impact QA",
+    title: "Outcome verification log",
+    summary:
+      "38 milestones audited with supporting documentation attached per scholar.",
+    owner: "Impact",
+    confidence: "High",
+    freshness_days: 3.1,
+    coverage_percent: 95,
+    updated_at: "NOW() - INTERVAL '2 days'",
+  },
+  {
+    source_id: "evidence-004",
+    source_type: "Risk Watch",
+    title: "Escalations requiring decisions",
+    summary:
+      "Three scholars need bridge funding approvals within 72 hours.",
+    owner: "Care Team",
+    confidence: "High",
+    freshness_days: 0.6,
+    coverage_percent: 97,
+    updated_at: "NOW() - INTERVAL '4 hours'",
+  },
+  {
+    source_id: "evidence-005",
+    source_type: "Scholar Voice",
+    title: "Advisor feedback notes",
+    summary:
+      "Latest check-ins highlight housing stability risks for two cohorts.",
+    owner: "Scholar Success",
+    confidence: "Medium",
+    freshness_days: 4.3,
+    coverage_percent: 86,
+    updated_at: "NOW() - INTERVAL '4 days'",
+  },
+];
+
 const decisions = [
   {
     decision_id: "decision-001",
@@ -302,6 +365,20 @@ const run = async () => {
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS impact_vault.evidence_sources (
+        id SERIAL PRIMARY KEY,
+        source_id TEXT UNIQUE NOT NULL,
+        source_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        owner TEXT NOT NULL,
+        confidence TEXT NOT NULL,
+        freshness_days NUMERIC(6, 2) NOT NULL,
+        coverage_percent NUMERIC(6, 2) NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
 
     for (const signal of signals) {
       await client.query(
@@ -413,6 +490,37 @@ const run = async () => {
           escalation.severity,
           escalation.status,
           escalation.due_date,
+        ]
+      );
+    }
+
+    for (const source of evidenceSources) {
+      await client.query(
+        `
+        INSERT INTO impact_vault.evidence_sources
+          (source_id, source_type, title, summary, owner, confidence, freshness_days, coverage_percent, updated_at)
+        VALUES
+          ($1, $2, $3, $4, $5, $6, $7, $8, ${source.updated_at})
+        ON CONFLICT (source_id)
+        DO UPDATE SET
+          source_type = EXCLUDED.source_type,
+          title = EXCLUDED.title,
+          summary = EXCLUDED.summary,
+          owner = EXCLUDED.owner,
+          confidence = EXCLUDED.confidence,
+          freshness_days = EXCLUDED.freshness_days,
+          coverage_percent = EXCLUDED.coverage_percent,
+          updated_at = EXCLUDED.updated_at;
+        `,
+        [
+          source.source_id,
+          source.source_type,
+          source.title,
+          source.summary,
+          source.owner,
+          source.confidence,
+          source.freshness_days,
+          source.coverage_percent,
         ]
       );
     }

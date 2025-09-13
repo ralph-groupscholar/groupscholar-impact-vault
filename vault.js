@@ -33,6 +33,12 @@ const refreshEscalations = document.querySelector("#refresh-escalations");
 const escalationsCount = document.querySelector("#escalations-count");
 const escalationsUpdated = document.querySelector("#escalations-updated");
 
+const evidenceBoard = document.querySelector("#evidence-board");
+const evidenceStatus = document.querySelector("#evidence-status");
+const evidenceFreshness = document.querySelector("#evidence-freshness");
+const evidenceCoverage = document.querySelector("#evidence-coverage");
+const evidenceOwners = document.querySelector("#evidence-owners");
+
 const pulseUpdated = document.querySelector("#pulse-updated");
 const pulseActiveCount = document.querySelector("#pulse-active-count");
 const pulseActiveMeta = document.querySelector("#pulse-active-meta");
@@ -196,6 +202,55 @@ const fallbackEscalations = [
     dueLabel: "Due in 1 week",
   },
 ];
+
+const fallbackEvidence = {
+  metrics: {
+    freshness: "6.2 days",
+    coverage: "94%",
+    owners: 12,
+  },
+  sources: [
+    {
+      id: "evidence-001",
+      sourceType: "Scholar CRM",
+      title: "Retention + completion dashboard",
+      summary:
+        "82% of scholars on pace to hit term milestones, with peer mentoring the top lift.",
+      owner: "Scholar Ops",
+      confidence: "High",
+      updatedAt: new Date(new Date().setHours(new Date().getHours() - 3)).toISOString(),
+    },
+    {
+      id: "evidence-002",
+      sourceType: "Partner Pulse",
+      title: "Placement demand forecast",
+      summary:
+        "Hiring managers flagged 19 roles as ready, with onboarding support locked in.",
+      owner: "Partnerships",
+      confidence: "Medium",
+      updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
+    },
+    {
+      id: "evidence-003",
+      sourceType: "Impact QA",
+      title: "Outcome verification log",
+      summary:
+        "38 milestones audited with supporting documentation attached per scholar.",
+      owner: "Impact",
+      confidence: "High",
+      updatedAt: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString(),
+    },
+    {
+      id: "evidence-004",
+      sourceType: "Risk Watch",
+      title: "Escalations requiring decisions",
+      summary: "Three scholars need bridge funding approvals within 72 hours.",
+      owner: "Care Team",
+      confidence: "High",
+      updatedAt: new Date(new Date().setHours(new Date().getHours() - 4)).toISOString(),
+    },
+  ],
+};
 
 const formatBriefDate = () =>
   new Date().toLocaleDateString("en-US", {
@@ -404,6 +459,133 @@ const formatEscalationsUpdated = (value) => {
     month: "short",
     day: "numeric",
   })}`;
+};
+
+const formatEvidenceUpdated = (value) => {
+  if (!value) {
+    return "Updated today";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Updated today";
+  }
+  const now = new Date();
+  const diffMs = now.setHours(0, 0, 0, 0) - date.setHours(0, 0, 0, 0);
+  const diffDays = Math.round(diffMs / 86400000);
+  if (diffDays <= 0) {
+    return "Updated today";
+  }
+  if (diffDays === 1) {
+    return "Updated yesterday";
+  }
+  return `Updated ${date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  })}`;
+};
+
+const buildEvidenceCard = (source) => {
+  const card = document.createElement("div");
+  card.className = "evidence-card";
+
+  const top = document.createElement("div");
+  top.className = "card-top";
+
+  const tag = document.createElement("span");
+  tag.className = "tag";
+  tag.textContent = source.sourceType || "Evidence";
+
+  const time = document.createElement("span");
+  time.className = "time";
+  time.textContent = formatEvidenceUpdated(source.updatedAt);
+
+  top.appendChild(tag);
+  top.appendChild(time);
+
+  const title = document.createElement("h3");
+  title.textContent = source.title || "Evidence update";
+
+  const summary = document.createElement("p");
+  summary.textContent = source.summary || "Source details pending.";
+
+  const meta = document.createElement("div");
+  meta.className = "card-meta";
+  meta.textContent = `Owner: ${source.owner || "Impact Ops"} · Confidence: ${source.confidence || "Medium"}`;
+
+  card.appendChild(top);
+  card.appendChild(title);
+  card.appendChild(summary);
+  card.appendChild(meta);
+
+  return card;
+};
+
+const renderEvidence = (payload) => {
+  if (!evidenceBoard) {
+    return;
+  }
+  evidenceBoard.innerHTML = "";
+
+  const sources = payload?.sources || [];
+  if (!sources.length) {
+    const empty = document.createElement("div");
+    empty.className = "evidence-card";
+    empty.innerHTML =
+      "<div class=\"card-top\"><span class=\"tag\">Evidence</span><span class=\"time\">Awaiting updates</span></div><h3>No evidence sources logged.</h3><p>Capture sources, owners, and confidence to keep brief claims audit-ready.</p><div class=\"card-meta\">Owner: Impact Ops · Confidence: Pending</div>";
+    evidenceBoard.appendChild(empty);
+    return;
+  }
+
+  sources.forEach((source, index) => {
+    const card = buildEvidenceCard(source);
+    if (index === 3) {
+      card.classList.add("highlight");
+    }
+    evidenceBoard.appendChild(card);
+  });
+};
+
+const loadEvidence = async ({ isRefresh = false } = {}) => {
+  if (!evidenceBoard) {
+    return;
+  }
+  if (evidenceStatus) {
+    evidenceStatus.textContent = isRefresh ? "Refreshing evidence ledger..." : "Loading evidence ledger…";
+    evidenceStatus.removeAttribute("data-state");
+  }
+
+  let payload = fallbackEvidence;
+  let usedFallback = true;
+  try {
+    const response = await fetch("/api/evidence");
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.sources?.length) {
+        payload = data;
+        usedFallback = false;
+      }
+    }
+  } catch (error) {
+    // Keep fallback evidence.
+  }
+
+  renderEvidence(payload);
+
+  if (evidenceFreshness) {
+    evidenceFreshness.textContent = payload?.metrics?.freshness || fallbackEvidence.metrics.freshness;
+  }
+  if (evidenceCoverage) {
+    evidenceCoverage.textContent = payload?.metrics?.coverage || fallbackEvidence.metrics.coverage;
+  }
+  if (evidenceOwners) {
+    const owners = payload?.metrics?.owners ?? fallbackEvidence.metrics.owners;
+    evidenceOwners.textContent = `${owners}`;
+  }
+  if (evidenceStatus) {
+    evidenceStatus.textContent = usedFallback
+      ? "Showing cached evidence. Live sync unavailable."
+      : `Evidence ledger synced · ${payload.sources.length} sources`;
+  }
 };
 
 const buildEscalationCard = (escalation) => {
@@ -1131,3 +1313,4 @@ updateSelectionList();
 loadArchive();
 loadDecisions();
 loadEscalations();
+loadEvidence();

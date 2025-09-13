@@ -101,22 +101,25 @@
           <div class="evidence-metrics">
             <div>
               <p class="panel-label">Freshness</p>
-              <p class="panel-value">6.2 days</p>
+              <p class="panel-value" id="evidence-freshness">6.2 days</p>
               <p class="panel-meta">Avg. source age</p>
             </div>
             <div>
               <p class="panel-label">Coverage</p>
-              <p class="panel-value">94%</p>
+              <p class="panel-value" id="evidence-coverage">94%</p>
               <p class="panel-meta">Brief claims verified</p>
             </div>
             <div>
               <p class="panel-label">Owners</p>
-              <p class="panel-value">12</p>
+              <p class="panel-value" id="evidence-owners">12</p>
               <p class="panel-meta">Active data stewards</p>
             </div>
           </div>
+          <div class="evidence-status" id="evidence-status" aria-live="polite">
+            Loading evidence ledger…
+          </div>
         </div>
-        <div class="evidence-board">
+        <div class="evidence-board" id="evidence-board">
           <div class="evidence-card">
             <div class="card-top">
               <span class="tag">Scholar CRM</span>

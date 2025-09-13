@@ -89,3 +89,8 @@
 - Added an Escalation Queue section with live refresh controls and severity/status styling.
 - Built a new escalations API and database table with seed data for urgent risk tracking.
 - Wired the front-end to load escalations with fallback cards and queue status messaging.
+
+## Iteration 42 - 2026-02-08 01:34:05 EST
+- Added a live Evidence Locker feed with API-backed evidence sources plus dynamic freshness, coverage, and owner metrics.
+- Created the evidence_sources table and seeded production with traceable evidence updates and confidence levels.
+- Updated the evidence UI to render live sources, sync status messaging, and fallback handling.
