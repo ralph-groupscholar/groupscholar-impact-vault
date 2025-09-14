@@ -94,3 +94,8 @@
 - Added a live Evidence Locker feed with API-backed evidence sources plus dynamic freshness, coverage, and owner metrics.
 - Created the evidence_sources table and seeded production with traceable evidence updates and confidence levels.
 - Updated the evidence UI to render live sources, sync status messaging, and fallback handling.
+
+## Iteration 74 - 2026-02-08 06:00:25 EST
+- Wired the Partner Commitments ledger refresh button to trigger live reloads.
+- Added the commitments data load to the main dashboard boot sequence so the section renders live data.
+- Kept the commitments status messaging aligned with refresh state for clearer operator feedback.

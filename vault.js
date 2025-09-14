@@ -33,11 +33,28 @@ const refreshEscalations = document.querySelector("#refresh-escalations");
 const escalationsCount = document.querySelector("#escalations-count");
 const escalationsUpdated = document.querySelector("#escalations-updated");
 
+const commitmentsGrid = document.querySelector("#commitments-grid");
+const commitmentsStatus = document.querySelector("#commitments-status");
+const refreshCommitments = document.querySelector("#refresh-commitments");
+const commitmentsCount = document.querySelector("#commitments-count");
+const commitmentsUpdated = document.querySelector("#commitments-updated");
+
 const evidenceBoard = document.querySelector("#evidence-board");
 const evidenceStatus = document.querySelector("#evidence-status");
 const evidenceFreshness = document.querySelector("#evidence-freshness");
 const evidenceCoverage = document.querySelector("#evidence-coverage");
 const evidenceOwners = document.querySelector("#evidence-owners");
+
+const momentumGrid = document.querySelector("#momentum-grid");
+const momentumTimeline = document.querySelector("#momentum-timeline");
+
+const voiceBoard = document.querySelector("#voice-board");
+const voiceCheckins = document.querySelector("#voice-checkins");
+const voiceCheckinsMeta = document.querySelector("#voice-checkins-meta");
+const voiceSentiment = document.querySelector("#voice-sentiment");
+const voiceSentimentMeta = document.querySelector("#voice-sentiment-meta");
+const voiceNeeds = document.querySelector("#voice-needs");
+const voiceNeedsMeta = document.querySelector("#voice-needs-meta");
 
 const pulseUpdated = document.querySelector("#pulse-updated");
 const pulseActiveCount = document.querySelector("#pulse-active-count");
@@ -203,6 +220,49 @@ const fallbackEscalations = [
   },
 ];
 
+const fallbackCommitments = [
+  {
+    id: "commitment-001",
+    partner: "Northbridge Health Systems",
+    milestone: "Confirm 24 spring internship placements",
+    owner: "Partnerships",
+    status: "On track",
+    confidence: "High",
+    dueLabel: "Due Feb 20",
+    impactValue: "$420k projected wage lift",
+  },
+  {
+    id: "commitment-002",
+    partner: "CivicTech Labs",
+    milestone: "Deliver interview prep cohort for 32 scholars",
+    owner: "Career Readiness",
+    status: "At risk",
+    confidence: "Medium",
+    dueLabel: "Due Feb 14",
+    impactValue: "32 scholars placement-ready",
+  },
+  {
+    id: "commitment-003",
+    partner: "Sunrise Manufacturing",
+    milestone: "Launch on-site mentor pairing",
+    owner: "Partner Success",
+    status: "Active",
+    confidence: "High",
+    dueLabel: "Due Feb 28",
+    impactValue: "18 mentor matches confirmed",
+  },
+  {
+    id: "commitment-004",
+    partner: "Atlas Logistics",
+    milestone: "Finalize onboarding playbook refresh",
+    owner: "Operations",
+    status: "In review",
+    confidence: "Low",
+    dueLabel: "Due Feb 18",
+    impactValue: "Reduce onboarding time by 20%",
+  },
+];
+
 const fallbackEvidence = {
   metrics: {
     freshness: "6.2 days",
@@ -250,6 +310,147 @@ const fallbackEvidence = {
       updatedAt: new Date(new Date().setHours(new Date().getHours() - 4)).toISOString(),
     },
   ],
+};
+
+const fallbackVoice = {
+  metrics: {
+    checkinsCount: 214,
+    sentimentScore: 0.42,
+    sentimentChange: 0.11,
+    needsFlagged: 19,
+  },
+  entries: [
+    {
+      id: "voice-001",
+      tag: "Well-being",
+      quote: "The mentoring pods make the workload feel doable.",
+      summary:
+        "Scholars in STEM majors report higher confidence when mentor check-ins happen twice weekly during midterms.",
+      owner: "Scholar Success",
+      action: "Lock mentor coverage",
+      observedAt: new Date(new Date().setHours(new Date().getHours() - 6)).toISOString(),
+      highlight: false,
+    },
+    {
+      id: "voice-002",
+      tag: "Career Readiness",
+      quote: "We need more interview practice before placement.",
+      summary:
+        "12 scholars asked for mock interviews tied to partner roles, especially in health and operations tracks.",
+      owner: "Partnerships",
+      action: "Schedule mock series",
+      observedAt: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
+      highlight: false,
+    },
+    {
+      id: "voice-003",
+      tag: "Financial Stability",
+      quote: "My aid package still hasn't arrived.",
+      summary:
+        "Two campuses reported delayed disbursements; bridge funding requests are pending for six scholars.",
+      owner: "Operations",
+      action: "Approve bridge funding",
+      observedAt: new Date().toISOString(),
+      highlight: true,
+    },
+  ],
+};
+
+const fallbackMomentum = {
+  cards: [
+    {
+      id: "momentum-001",
+      tag: "Lift Tracker",
+      timeLabel: "This week",
+      title: "Persistence acceleration",
+      summary: "Mentored cohorts showed +9% persistence after the new onboarding sequence.",
+      owner: "Scholar Success",
+      nextStep: "Expand to 3 campuses",
+      accent: false,
+    },
+    {
+      id: "momentum-002",
+      tag: "Funding Forecast",
+      timeLabel: "Next 30 days",
+      title: "Aid runway and bridge triggers",
+      summary: "$86k bridge capacity available with two campuses flagged for disbursement lag.",
+      owner: "Finance",
+      nextStep: "Packaging slips > 10 days",
+      accent: true,
+    },
+    {
+      id: "momentum-003",
+      tag: "Partner Follow-through",
+      timeLabel: "Rolling",
+      title: "Placement readiness",
+      summary: "7 employers completed readiness playbooks; 3 need advisor syncs this week.",
+      owner: "Partnerships",
+      nextStep: "Readiness huddle on Tues",
+      accent: false,
+    },
+  ],
+  timeline: [
+    {
+      id: "timeline-001",
+      weekLabel: "Week 1 Focus",
+      title: "Stabilize aid packaging",
+      summary: "Daily check-ins with campus aid offices and bridge approvals pre-cleared.",
+      highlight: false,
+    },
+    {
+      id: "timeline-002",
+      weekLabel: "Week 2 Focus",
+      title: "Activate mentoring push",
+      summary: "Scale peer mentor cohort sessions with early-alert flagging for at-risk scholars.",
+      highlight: false,
+    },
+    {
+      id: "timeline-003",
+      weekLabel: "Week 3 Focus",
+      title: "Partner pipeline sync",
+      summary: "Confirm placement interviews and refresh manager support playbooks.",
+      highlight: false,
+    },
+    {
+      id: "timeline-004",
+      weekLabel: "Week 4 Focus",
+      title: "Impact proof handoff",
+      summary: "Audit outcomes, capture scholar voice, and ship the board-ready snapshot.",
+      highlight: true,
+    },
+  ],
+};
+
+const formatRelativeTime = (value) => {
+  if (!value) {
+    return "Updated today";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Updated today";
+  }
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffHours = Math.round(diffMs / 3600000);
+  if (diffHours < 1) {
+    return "Just now";
+  }
+  if (diffHours < 24) {
+    return `${diffHours} hr${diffHours === 1 ? "" : "s"} ago`;
+  }
+  const diffDays = Math.round(diffMs / 86400000);
+  if (diffDays === 1) {
+    return "Yesterday";
+  }
+  return `${diffDays} days ago`;
+};
+
+const formatSentiment = (value) => {
+  const number = Number(value);
+  if (Number.isNaN(number)) {
+    return "--";
+  }
+  return `${number >= 0 ? "+" : ""}${number.toFixed(2)}`;
 };
 
 const formatBriefDate = () =>
@@ -588,6 +789,231 @@ const loadEvidence = async ({ isRefresh = false } = {}) => {
   }
 };
 
+const buildVoiceCard = (entry) => {
+  const card = document.createElement("article");
+  card.className = "voice-card";
+  if (entry.highlight) {
+    card.classList.add("highlight");
+  }
+
+  const top = document.createElement("div");
+  top.className = "card-top";
+
+  const tag = document.createElement("span");
+  tag.className = "tag";
+  tag.textContent = entry.tag || "Scholar Voice";
+
+  const time = document.createElement("span");
+  time.className = "time";
+  time.textContent = formatRelativeTime(entry.observedAt);
+
+  top.appendChild(tag);
+  top.appendChild(time);
+
+  const title = document.createElement("h3");
+  title.textContent = entry.quote ? `"${entry.quote}"` : "Scholar voice update";
+
+  const summary = document.createElement("p");
+  summary.textContent = entry.summary || "Voice insight pending.";
+
+  const meta = document.createElement("div");
+  meta.className = "card-meta";
+  meta.textContent = `Owner: ${entry.owner || "Scholar Success"} · Action: ${
+    entry.action || "Follow up"
+  }`;
+
+  card.appendChild(top);
+  card.appendChild(title);
+  card.appendChild(summary);
+  card.appendChild(meta);
+
+  return card;
+};
+
+const renderVoice = (payload) => {
+  if (!voiceBoard) {
+    return;
+  }
+  voiceBoard.innerHTML = "";
+
+  const entries = payload?.entries || [];
+  if (!entries.length) {
+    const empty = document.createElement("article");
+    empty.className = "voice-card placeholder";
+    empty.innerHTML =
+      "<div class=\"card-top\"><span class=\"tag\">Scholar Voice</span><span class=\"time\">Awaiting updates</span></div><h3>No scholar voice updates logged.</h3><p>Log check-ins and lived experience to ground the brief.</p><div class=\"card-meta\">Owner: Scholar Success · Action: Capture updates</div>";
+    voiceBoard.appendChild(empty);
+    return;
+  }
+
+  entries.forEach((entry) => {
+    voiceBoard.appendChild(buildVoiceCard(entry));
+  });
+};
+
+const loadVoice = async () => {
+  let payload = fallbackVoice;
+  try {
+    const response = await fetch("/api/voice");
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.entries?.length) {
+        payload = data;
+      }
+    }
+  } catch (error) {
+    // Keep fallback.
+  }
+
+  renderVoice(payload);
+
+  const metrics = payload?.metrics || fallbackVoice.metrics;
+  if (voiceCheckins) {
+    voiceCheckins.textContent = String(metrics.checkinsCount ?? fallbackVoice.metrics.checkinsCount);
+  }
+  if (voiceCheckinsMeta) {
+    voiceCheckinsMeta.textContent = "This week";
+  }
+  if (voiceSentiment) {
+    voiceSentiment.textContent = formatSentiment(metrics.sentimentScore);
+  }
+  if (voiceSentimentMeta) {
+    const score = Number(metrics.sentimentScore);
+    const change = Number(metrics.sentimentChange);
+    if (!Number.isNaN(score) && !Number.isNaN(change)) {
+      const previous = score - change;
+      const direction = change >= 0 ? "Up from" : "Down from";
+      voiceSentimentMeta.textContent = `${direction} ${formatSentiment(previous)}`;
+    } else {
+      voiceSentimentMeta.textContent = "Sentiment trending";
+    }
+  }
+  if (voiceNeeds) {
+    voiceNeeds.textContent = String(metrics.needsFlagged ?? fallbackVoice.metrics.needsFlagged);
+  }
+  if (voiceNeedsMeta) {
+    voiceNeedsMeta.textContent = "Open follow-ups";
+  }
+};
+
+const buildMomentumCard = (cardData) => {
+  const card = document.createElement("article");
+  card.className = "momentum-card";
+  if (cardData.accent) {
+    card.classList.add("accent");
+  }
+
+  const top = document.createElement("div");
+  top.className = "card-top";
+
+  const tag = document.createElement("span");
+  tag.className = "tag";
+  tag.textContent = cardData.tag || "Momentum";
+
+  const time = document.createElement("span");
+  time.className = "time";
+  time.textContent = cardData.timeLabel || "Update";
+
+  top.appendChild(tag);
+  top.appendChild(time);
+
+  const title = document.createElement("h3");
+  title.textContent = cardData.title || "Momentum update";
+
+  const summary = document.createElement("p");
+  summary.textContent = cardData.summary || "Details pending.";
+
+  const meta = document.createElement("div");
+  meta.className = "card-meta";
+  meta.textContent = `Owner: ${cardData.owner || "Impact Ops"} · Next: ${
+    cardData.nextStep || "Review"
+  }`;
+
+  card.appendChild(top);
+  card.appendChild(title);
+  card.appendChild(summary);
+  card.appendChild(meta);
+
+  return card;
+};
+
+const buildTimelineCard = (item) => {
+  const card = document.createElement("div");
+  card.className = "timeline-card";
+  if (item.highlight) {
+    card.classList.add("highlight");
+  }
+
+  const label = document.createElement("p");
+  label.className = "timeline-label";
+  label.textContent = item.weekLabel || "Week";
+
+  const title = document.createElement("h3");
+  title.textContent = item.title || "Timeline focus";
+
+  const summary = document.createElement("p");
+  summary.textContent = item.summary || "Focus details pending.";
+
+  card.appendChild(label);
+  card.appendChild(title);
+  card.appendChild(summary);
+
+  return card;
+};
+
+const renderMomentum = (payload) => {
+  if (!momentumGrid || !momentumTimeline) {
+    return;
+  }
+
+  momentumGrid.innerHTML = "";
+  momentumTimeline.innerHTML = "";
+
+  const cardsData = payload?.cards || [];
+  const timelineData = payload?.timeline || [];
+
+  if (!cardsData.length) {
+    const empty = document.createElement("article");
+    empty.className = "momentum-card placeholder";
+    empty.innerHTML =
+      "<div class=\"card-top\"><span class=\"tag\">Momentum</span><span class=\"time\">Awaiting updates</span></div><h3>No momentum cards yet.</h3><p>Log lift, funding, and partner readiness to populate the cohort studio.</p><div class=\"card-meta\">Owner: Impact Ops · Next: Add momentum signals</div>";
+    momentumGrid.appendChild(empty);
+  } else {
+    cardsData.forEach((cardData) => {
+      momentumGrid.appendChild(buildMomentumCard(cardData));
+    });
+  }
+
+  if (!timelineData.length) {
+    const empty = document.createElement("div");
+    empty.className = "timeline-card placeholder";
+    empty.innerHTML =
+      "<p class=\"timeline-label\">Timeline</p><h3>No weekly focus yet.</h3><p>Capture the next four weeks of cohort priorities.</p>";
+    momentumTimeline.appendChild(empty);
+  } else {
+    timelineData.forEach((item) => {
+      momentumTimeline.appendChild(buildTimelineCard(item));
+    });
+  }
+};
+
+const loadMomentum = async () => {
+  let payload = fallbackMomentum;
+  try {
+    const response = await fetch("/api/momentum");
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.cards?.length) {
+        payload = data;
+      }
+    }
+  } catch (error) {
+    // Keep fallback.
+  }
+
+  renderMomentum(payload);
+};
+
 const buildEscalationCard = (escalation) => {
   const card = document.createElement("article");
   card.className = "escalation-card";
@@ -707,6 +1133,139 @@ const loadEscalations = async ({ isRefresh = false } = {}) => {
   }
   if (refreshEscalations) {
     refreshEscalations.disabled = false;
+  }
+};
+
+const getCommitmentStatusClass = (status) => {
+  const value = (status || "").toLowerCase();
+  if (value.includes("risk") || value.includes("blocked")) {
+    return "status-risk";
+  }
+  if (value.includes("review") || value.includes("pending")) {
+    return "status-review";
+  }
+  if (value.includes("track") || value.includes("active") || value.includes("on")) {
+    return "status-track";
+  }
+  return "";
+};
+
+const buildCommitmentCard = (commitment) => {
+  const card = document.createElement("div");
+  card.className = "commitment-card";
+  const statusClass = getCommitmentStatusClass(commitment.status);
+  if (statusClass) {
+    card.classList.add(statusClass);
+  }
+
+  const title = document.createElement("h3");
+  title.className = "commitment-title";
+  title.textContent = commitment.partner || "Partner commitment";
+
+  const summary = document.createElement("p");
+  summary.className = "commitment-summary";
+  summary.textContent = commitment.milestone || "Milestone details pending.";
+
+  const pills = document.createElement("div");
+  pills.className = "commitment-meta";
+
+  const statusPill = document.createElement("span");
+  statusPill.className = "commitment-pill";
+  statusPill.textContent = commitment.status || "Pending";
+
+  const confidencePill = document.createElement("span");
+  confidencePill.className = "commitment-pill subtle";
+  confidencePill.textContent = `${commitment.confidence || "Medium"} confidence`;
+
+  const duePill = document.createElement("span");
+  duePill.className = "commitment-pill subtle";
+  duePill.textContent = commitment.dueLabel || "Due soon";
+
+  const valuePill = document.createElement("span");
+  valuePill.className = "commitment-pill";
+  valuePill.textContent = commitment.impactValue || "Impact value pending";
+
+  pills.appendChild(statusPill);
+  pills.appendChild(confidencePill);
+  pills.appendChild(duePill);
+  pills.appendChild(valuePill);
+
+  const owner = document.createElement("div");
+  owner.className = "commitment-meta";
+  owner.textContent = `Owner: ${commitment.owner || "Partnerships"}`;
+
+  card.appendChild(title);
+  card.appendChild(summary);
+  card.appendChild(pills);
+  card.appendChild(owner);
+
+  return card;
+};
+
+const renderCommitments = (commitments) => {
+  if (!commitmentsGrid) {
+    return;
+  }
+  commitmentsGrid.innerHTML = "";
+
+  if (!commitments.length) {
+    const empty = document.createElement("div");
+    empty.className = "commitment-card placeholder";
+    empty.innerHTML = `<p class="commitment-title">No partner commitments logged.</p><p class="commitment-summary">Capture promises and due dates to keep partners accountable.</p>`;
+    commitmentsGrid.appendChild(empty);
+    return;
+  }
+
+  commitments.forEach((commitment) => {
+    commitmentsGrid.appendChild(buildCommitmentCard(commitment));
+  });
+};
+
+const loadCommitments = async ({ isRefresh = false } = {}) => {
+  if (!commitmentsGrid) {
+    return;
+  }
+  if (refreshCommitments) {
+    refreshCommitments.disabled = true;
+  }
+  if (commitmentsStatus) {
+    commitmentsStatus.textContent = isRefresh
+      ? "Refreshing commitments..."
+      : "Loading commitments…";
+  }
+
+  let commitments = fallbackCommitments;
+  let meta = { total: fallbackCommitments.length, lastSync: new Date().toISOString() };
+  let usedFallback = true;
+  try {
+    const response = await fetch("/api/commitments");
+    if (response.ok) {
+      const payload = await response.json();
+      if (Array.isArray(payload.commitments)) {
+        commitments = payload.commitments;
+        meta = payload.meta || meta;
+        usedFallback = false;
+      }
+    }
+  } catch (error) {
+    // Keep fallback data.
+  }
+
+  renderCommitments(commitments);
+  if (commitmentsCount) {
+    const total = meta?.total || commitments.length;
+    commitmentsCount.textContent = `${total} commitments`;
+  }
+  if (commitmentsUpdated) {
+    commitmentsUpdated.textContent = formatEscalationsUpdated(meta?.lastSync);
+  }
+  if (commitmentsStatus) {
+    commitmentsStatus.textContent = usedFallback
+      ? "Showing cached commitments. Live sync unavailable."
+      : `Commitments synced · ${commitments.length} tracked.`;
+  }
+  if (refreshCommitments) {
+    refreshCommitments.disabled = false;
   }
 };
 
@@ -1307,10 +1866,17 @@ saveBrief?.addEventListener("click", async () => {
   }
 });
 
+refreshCommitments?.addEventListener("click", () => {
+  loadCommitments({ isRefresh: true });
+});
+
 loadSignals();
 loadPulse();
 updateSelectionList();
 loadArchive();
 loadDecisions();
 loadEscalations();
+loadCommitments();
 loadEvidence();
+loadVoice();
+loadMomentum();
