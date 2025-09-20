@@ -215,55 +215,22 @@
           </div>
           <button class="ghost">Open Cohort Studio</button>
         </div>
-        <div class="momentum-grid">
-          <article class="momentum-card">
+        <div class="momentum-grid" id="momentum-grid">
+          <article class="momentum-card placeholder">
             <div class="card-top">
-              <span class="tag">Lift Tracker</span>
-              <span class="time">This week</span>
+              <span class="tag">Cohort Studio</span>
+              <span class="time">Loading</span>
             </div>
-            <h3>Persistence acceleration</h3>
-            <p>Mentored cohorts showed +9% persistence after the new onboarding sequence.</p>
-            <div class="card-meta">Owner: Scholar Success · Next: Expand to 3 campuses</div>
-          </article>
-          <article class="momentum-card accent">
-            <div class="card-top">
-              <span class="tag">Funding Forecast</span>
-              <span class="time">Next 30 days</span>
-            </div>
-            <h3>Aid runway and bridge triggers</h3>
-            <p>$86k bridge capacity available with two campuses flagged for disbursement lag.</p>
-            <div class="card-meta">Owner: Finance · Trigger: Packaging slips &gt; 10 days</div>
-          </article>
-          <article class="momentum-card">
-            <div class="card-top">
-              <span class="tag">Partner Follow-through</span>
-              <span class="time">Rolling</span>
-            </div>
-            <h3>Placement readiness</h3>
-            <p>7 employers completed readiness playbooks; 3 need advisor syncs this week.</p>
-            <div class="card-meta">Owner: Partnerships · Next: Readiness huddle on Tues</div>
+            <h3>Momentum updates loading</h3>
+            <p>Sync the latest lift, funding, and partner readiness signals.</p>
+            <div class="card-meta">Owner: Impact Ops · Next: Refresh live feed</div>
           </article>
         </div>
-        <div class="momentum-timeline">
-          <div class="timeline-card">
-            <p class="timeline-label">Week 1 Focus</p>
-            <h3>Stabilize aid packaging</h3>
-            <p>Daily check-ins with campus aid offices and bridge approvals pre-cleared.</p>
-          </div>
-          <div class="timeline-card">
-            <p class="timeline-label">Week 2 Focus</p>
-            <h3>Activate mentoring push</h3>
-            <p>Scale peer mentor cohort sessions with early-alert flagging for at-risk scholars.</p>
-          </div>
-          <div class="timeline-card">
-            <p class="timeline-label">Week 3 Focus</p>
-            <h3>Partner pipeline sync</h3>
-            <p>Confirm placement interviews and refresh manager support playbooks.</p>
-          </div>
-          <div class="timeline-card highlight">
-            <p class="timeline-label">Week 4 Focus</p>
-            <h3>Impact proof handoff</h3>
-            <p>Audit outcomes, capture scholar voice, and ship the board-ready snapshot.</p>
+        <div class="momentum-timeline" id="momentum-timeline">
+          <div class="timeline-card placeholder">
+            <p class="timeline-label">Timeline</p>
+            <h3>Weekly focus loading</h3>
+            <p>Connect the upcoming milestones to the live cohort plan.</p>
           </div>
         </div>
       </section>
@@ -334,6 +301,42 @@
         </div>
       </section>
 
+      <section class="commitments">
+        <div class="commitments-header">
+          <div>
+            <p class="eyebrow">Partner Commitments</p>
+            <h2>Track partner promises tied to outcomes, owners, and due dates.</h2>
+            <p class="lede">
+              Keep employer and funder commitments visible so the weekly brief highlights what is
+              on track, at risk, or ready to accelerate.
+            </p>
+          </div>
+          <div class="commitments-meta">
+            <span class="meta-pill" id="commitments-count">0 commitments</span>
+            <span class="meta-pill subtle commitment-track" id="commitments-ontrack">
+              -- on track
+            </span>
+            <span class="meta-pill subtle commitment-risk" id="commitments-risk">
+              -- at risk
+            </span>
+            <span class="meta-pill subtle commitment-due" id="commitments-due">
+              -- due soon
+            </span>
+            <span class="meta-pill subtle" id="commitments-updated">Last sync: --</span>
+            <span id="commitments-status">Loading commitments…</span>
+            <button class="ghost small" id="refresh-commitments" type="button">
+              Refresh commitments
+            </button>
+          </div>
+        </div>
+        <div class="commitments-grid" id="commitments-grid">
+          <div class="commitment-card placeholder">
+            <p class="commitment-title">No partner commitments loaded yet.</p>
+            <p class="commitment-summary">Refresh the ledger to see the latest promises.</p>
+          </div>
+        </div>
+      </section>
+
       <section class="voice">
         <div class="voice-intro">
           <p class="eyebrow">Scholar Voice Radar</p>
@@ -345,57 +348,30 @@
           <div class="voice-metrics">
             <div>
               <p class="panel-label">Check-ins</p>
-              <p class="panel-value">214</p>
-              <p class="panel-meta">This week</p>
+              <p class="panel-value" id="voice-checkins">--</p>
+              <p class="panel-meta" id="voice-checkins-meta">This week</p>
             </div>
             <div>
               <p class="panel-label">Sentiment</p>
-              <p class="panel-value">+0.42</p>
-              <p class="panel-meta">Up from +0.31</p>
+              <p class="panel-value" id="voice-sentiment">--</p>
+              <p class="panel-meta" id="voice-sentiment-meta">--</p>
             </div>
             <div>
               <p class="panel-label">Needs Flagged</p>
-              <p class="panel-value">19</p>
-              <p class="panel-meta">Open follow-ups</p>
+              <p class="panel-value" id="voice-needs">--</p>
+              <p class="panel-meta" id="voice-needs-meta">Open follow-ups</p>
             </div>
           </div>
         </div>
-        <div class="voice-board">
-          <article class="voice-card">
+        <div class="voice-board" id="voice-board">
+          <article class="voice-card placeholder">
             <div class="card-top">
-              <span class="tag">Well-being</span>
-              <span class="time">6 hrs ago</span>
+              <span class="tag">Scholar Voice</span>
+              <span class="time">Loading</span>
             </div>
-            <h3>“The mentoring pods make the workload feel doable.”</h3>
-            <p>
-              Scholars in STEM majors report higher confidence when mentor check-ins happen twice
-              weekly during midterms.
-            </p>
-            <div class="card-meta">Owner: Scholar Success · Action: Lock mentor coverage</div>
-          </article>
-          <article class="voice-card">
-            <div class="card-top">
-              <span class="tag">Career Readiness</span>
-              <span class="time">Yesterday</span>
-            </div>
-            <h3>“We need more interview practice before placement.”</h3>
-            <p>
-              12 scholars asked for mock interviews tied to partner roles, especially in health and
-              operations tracks.
-            </p>
-            <div class="card-meta">Owner: Partnerships · Action: Schedule mock series</div>
-          </article>
-          <article class="voice-card highlight">
-            <div class="card-top">
-              <span class="tag">Financial Stability</span>
-              <span class="time">Today</span>
-            </div>
-            <h3>“My aid package still hasn’t arrived.”</h3>
-            <p>
-              Two campuses reported delayed disbursements; bridge funding requests are pending for
-              six scholars.
-            </p>
-            <div class="card-meta">Owner: Operations · Action: Approve bridge funding</div>
+            <h3>Scholar voice insights loading</h3>
+            <p>Sync the latest check-ins, needs, and lived experience highlights.</p>
+            <div class="card-meta">Owner: Scholar Success · Action: Refresh live feed</div>
           </article>
         </div>
       </section>

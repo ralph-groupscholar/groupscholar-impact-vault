@@ -5,6 +5,8 @@ const vaultUpdated = document.querySelector("#vault-updated");
 const vaultStatus = document.querySelector("#vault-status");
 const refreshSignals = document.querySelector("#refresh-signals");
 let cards = [];
+let commitmentsCache = [];
+let commitmentsMeta = null;
 
 const selectionList = document.querySelector("#selection-list");
 const selectionCount = document.querySelector("#selection-count");
@@ -38,6 +40,9 @@ const commitmentsStatus = document.querySelector("#commitments-status");
 const refreshCommitments = document.querySelector("#refresh-commitments");
 const commitmentsCount = document.querySelector("#commitments-count");
 const commitmentsUpdated = document.querySelector("#commitments-updated");
+const commitmentsOnTrack = document.querySelector("#commitments-ontrack");
+const commitmentsRisk = document.querySelector("#commitments-risk");
+const commitmentsDue = document.querySelector("#commitments-due");
 
 const evidenceBoard = document.querySelector("#evidence-board");
 const evidenceStatus = document.querySelector("#evidence-status");
@@ -228,6 +233,7 @@ const fallbackCommitments = [
     owner: "Partnerships",
     status: "On track",
     confidence: "High",
+    dueDate: "2026-02-20",
     dueLabel: "Due Feb 20",
     impactValue: "$420k projected wage lift",
   },
@@ -238,6 +244,7 @@ const fallbackCommitments = [
     owner: "Career Readiness",
     status: "At risk",
     confidence: "Medium",
+    dueDate: "2026-02-14",
     dueLabel: "Due Feb 14",
     impactValue: "32 scholars placement-ready",
   },
@@ -248,6 +255,7 @@ const fallbackCommitments = [
     owner: "Partner Success",
     status: "Active",
     confidence: "High",
+    dueDate: "2026-02-28",
     dueLabel: "Due Feb 28",
     impactValue: "18 mentor matches confirmed",
   },
@@ -258,6 +266,7 @@ const fallbackCommitments = [
     owner: "Operations",
     status: "In review",
     confidence: "Low",
+    dueDate: "2026-02-18",
     dueLabel: "Due Feb 18",
     impactValue: "Reduce onboarding time by 20%",
   },
@@ -1150,6 +1159,88 @@ const getCommitmentStatusClass = (status) => {
   return "";
 };
 
+const isCommitmentAtRisk = (commitment) => {
+  const status = (commitment.status || "").toLowerCase();
+  const confidence = (commitment.confidence || "").toLowerCase();
+  return (
+    status.includes("risk") ||
+    status.includes("blocked") ||
+    status.includes("delayed") ||
+    confidence.includes("low")
+  );
+};
+
+const parseCommitmentDate = (value) => {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const computeCommitmentStats = (commitments) => {
+  const stats = { onTrack: 0, atRisk: 0, dueSoon: 0 };
+  const now = new Date();
+  const soon = new Date(now);
+  soon.setDate(soon.getDate() + 7);
+
+  commitments.forEach((commitment) => {
+    const status = (commitment.status || "").toLowerCase();
+    if (status.includes("risk") || status.includes("blocked")) {
+      stats.atRisk += 1;
+    }
+    if (status.includes("track") || status.includes("active") || status.includes("on")) {
+      stats.onTrack += 1;
+    }
+    const due = parseCommitmentDate(commitment.dueDate);
+    if (due && due <= soon) {
+      stats.dueSoon += 1;
+    }
+  });
+
+  return stats;
+};
+
+const getCommitmentSummaryLines = () => {
+  if (!commitmentsCache.length) {
+    return [];
+  }
+
+  const total = commitmentsMeta?.total || commitmentsCache.length;
+  const lines = ["", "Partner commitments watchlist:", `Commitments tracked: ${total}`];
+
+  const atRisk = commitmentsCache.filter(isCommitmentAtRisk).slice(0, 2);
+  if (atRisk.length) {
+    lines.push(`At-risk: ${atRisk.map((item) => item.partner).join(", ")}`);
+  }
+
+  const upcoming = [...commitmentsCache]
+    .sort((a, b) => {
+      const aDate = parseCommitmentDate(a.dueDate);
+      const bDate = parseCommitmentDate(b.dueDate);
+      if (!aDate && !bDate) {
+        return 0;
+      }
+      if (!aDate) {
+        return 1;
+      }
+      if (!bDate) {
+        return -1;
+      }
+      return aDate - bDate;
+    })
+    .slice(0, 2);
+
+  if (upcoming.length) {
+    const upcomingLabel = upcoming
+      .map((item) => `${item.partner} (${item.dueLabel || "Due soon"})`)
+      .join("; ");
+    lines.push(`Next due: ${upcomingLabel}`);
+  }
+
+  return lines;
+};
+
 const buildCommitmentCard = (commitment) => {
   const card = document.createElement("div");
   card.className = "commitment-card";
@@ -1235,7 +1326,11 @@ const loadCommitments = async ({ isRefresh = false } = {}) => {
   }
 
   let commitments = fallbackCommitments;
-  let meta = { total: fallbackCommitments.length, lastSync: new Date().toISOString() };
+  let meta = {
+    total: fallbackCommitments.length,
+    lastSync: new Date().toISOString(),
+    stats: computeCommitmentStats(fallbackCommitments),
+  };
   let usedFallback = true;
   try {
     const response = await fetch("/api/commitments");
@@ -1252,9 +1347,21 @@ const loadCommitments = async ({ isRefresh = false } = {}) => {
   }
 
   renderCommitments(commitments);
+  commitmentsCache = commitments;
+  commitmentsMeta = meta;
   if (commitmentsCount) {
     const total = meta?.total || commitments.length;
     commitmentsCount.textContent = `${total} commitments`;
+  }
+  const stats = meta?.stats || computeCommitmentStats(commitments);
+  if (commitmentsOnTrack) {
+    commitmentsOnTrack.textContent = `${stats.onTrack ?? 0} on track`;
+  }
+  if (commitmentsRisk) {
+    commitmentsRisk.textContent = `${stats.atRisk ?? 0} at risk`;
+  }
+  if (commitmentsDue) {
+    commitmentsDue.textContent = `${stats.dueSoon ?? 0} due soon`;
   }
   if (commitmentsUpdated) {
     commitmentsUpdated.textContent = formatEscalationsUpdated(meta?.lastSync);
@@ -1267,6 +1374,7 @@ const loadCommitments = async ({ isRefresh = false } = {}) => {
   if (refreshCommitments) {
     refreshCommitments.disabled = false;
   }
+  updateBriefOutput();
 };
 
 const getCounts = () => {
@@ -1411,6 +1519,7 @@ const buildBriefText = () => {
 
   if (total === 0) {
     lines.push("Select 3-5 signals to generate a full brief pack.");
+    lines.push(...getCommitmentSummaryLines());
     return lines.join("\n");
   }
 
@@ -1422,6 +1531,7 @@ const buildBriefText = () => {
   });
   lines.push("");
   lines.push(`Narrative guidance: ${briefCallout.textContent}`);
+  lines.push(...getCommitmentSummaryLines());
 
   return lines.join("\n");
 };

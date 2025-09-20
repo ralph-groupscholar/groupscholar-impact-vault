@@ -99,3 +99,13 @@
 - Wired the Partner Commitments ledger refresh button to trigger live reloads.
 - Added the commitments data load to the main dashboard boot sequence so the section renders live data.
 - Kept the commitments status messaging aligned with refresh state for clearer operator feedback.
+
+## Iteration 75 - 2026-02-08 06:03:03 EST
+- Added commitment health summary pills for on-track, at-risk, and due-soon totals.
+- Extended the commitments API with aggregated status metrics for leadership visibility.
+- Updated fallback commitment data with due dates to keep metrics accurate offline.
+
+## Iteration 43 - 2026-02-08 06:02:24 EST
+- Added commitment watchlist logic to the brief export so saved briefs include partner accountability context.
+- Cached live commitments in the front-end and surfaced at-risk and upcoming due items in the briefing narrative.
+- Wired commitment refreshes to update the brief output automatically.
