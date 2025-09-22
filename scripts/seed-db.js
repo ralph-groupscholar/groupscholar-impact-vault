@@ -243,6 +243,122 @@ const evidenceSources = [
   },
 ];
 
+const voiceMetrics = {
+  snapshot_date: formatDate(new Date()),
+  checkins_count: 214,
+  sentiment_score: 0.42,
+  sentiment_change: 0.11,
+  needs_flagged: 19,
+  updated_at: "NOW() - INTERVAL '2 hours'",
+};
+
+const voiceEntries = [
+  {
+    entry_id: "voice-001",
+    tag: "Well-being",
+    quote: "The mentoring pods make the workload feel doable.",
+    summary:
+      "Scholars in STEM majors report higher confidence when mentor check-ins happen twice weekly during midterms.",
+    owner: "Scholar Success",
+    action: "Lock mentor coverage",
+    highlight: false,
+    observed_at: "NOW() - INTERVAL '6 hours'",
+  },
+  {
+    entry_id: "voice-002",
+    tag: "Career Readiness",
+    quote: "We need more interview practice before placement.",
+    summary:
+      "12 scholars asked for mock interviews tied to partner roles, especially in health and operations tracks.",
+    owner: "Partnerships",
+    action: "Schedule mock series",
+    highlight: false,
+    observed_at: "NOW() - INTERVAL '1 day'",
+  },
+  {
+    entry_id: "voice-003",
+    tag: "Financial Stability",
+    quote: "My aid package still hasn’t arrived.",
+    summary:
+      "Two campuses reported delayed disbursements; bridge funding requests are pending for six scholars.",
+    owner: "Operations",
+    action: "Approve bridge funding",
+    highlight: true,
+    observed_at: "NOW() - INTERVAL '3 hours'",
+  },
+];
+
+const momentumCards = [
+  {
+    card_id: "momentum-001",
+    tag: "Lift Tracker",
+    time_label: "This week",
+    title: "Persistence acceleration",
+    summary: "Mentored cohorts showed +9% persistence after the new onboarding sequence.",
+    owner: "Scholar Success",
+    next_step: "Expand to 3 campuses",
+    accent: false,
+    order_index: 1,
+  },
+  {
+    card_id: "momentum-002",
+    tag: "Funding Forecast",
+    time_label: "Next 30 days",
+    title: "Aid runway and bridge triggers",
+    summary: "$86k bridge capacity available with two campuses flagged for disbursement lag.",
+    owner: "Finance",
+    next_step: "Packaging slips > 10 days",
+    accent: true,
+    order_index: 2,
+  },
+  {
+    card_id: "momentum-003",
+    tag: "Partner Follow-through",
+    time_label: "Rolling",
+    title: "Placement readiness",
+    summary: "7 employers completed readiness playbooks; 3 need advisor syncs this week.",
+    owner: "Partnerships",
+    next_step: "Readiness huddle on Tues",
+    accent: false,
+    order_index: 3,
+  },
+];
+
+const momentumTimeline = [
+  {
+    timeline_id: "timeline-001",
+    week_label: "Week 1 Focus",
+    title: "Stabilize aid packaging",
+    summary: "Daily check-ins with campus aid offices and bridge approvals pre-cleared.",
+    highlight: false,
+    order_index: 1,
+  },
+  {
+    timeline_id: "timeline-002",
+    week_label: "Week 2 Focus",
+    title: "Activate mentoring push",
+    summary: "Scale peer mentor cohort sessions with early-alert flagging for at-risk scholars.",
+    highlight: false,
+    order_index: 2,
+  },
+  {
+    timeline_id: "timeline-003",
+    week_label: "Week 3 Focus",
+    title: "Partner pipeline sync",
+    summary: "Confirm placement interviews and refresh manager support playbooks.",
+    highlight: false,
+    order_index: 3,
+  },
+  {
+    timeline_id: "timeline-004",
+    week_label: "Week 4 Focus",
+    title: "Impact proof handoff",
+    summary: "Audit outcomes, capture scholar voice, and ship the board-ready snapshot.",
+    highlight: true,
+    order_index: 4,
+  },
+];
+
 const decisions = [
   {
     decision_id: "decision-001",
@@ -287,6 +403,59 @@ const decisions = [
     status: "Queued",
     priority: "High",
     created_at: "NOW() - INTERVAL '4 days'",
+  },
+];
+
+const commitments = [
+  {
+    commitment_id: "commitment-001",
+    partner_name: "Northbridge Health Systems",
+    milestone: "Confirm 24 spring internship placements",
+    owner: "Partnerships",
+    status: "On track",
+    confidence: "High",
+    due_date: forwardDays(12),
+    impact_value: "$420k projected wage lift",
+  },
+  {
+    commitment_id: "commitment-002",
+    partner_name: "CivicTech Labs",
+    milestone: "Deliver interview prep cohort for 32 scholars",
+    owner: "Career Readiness",
+    status: "At risk",
+    confidence: "Medium",
+    due_date: forwardDays(6),
+    impact_value: "32 scholars placement-ready",
+  },
+  {
+    commitment_id: "commitment-003",
+    partner_name: "Sunrise Manufacturing",
+    milestone: "Launch on-site mentor pairing",
+    owner: "Partner Success",
+    status: "Active",
+    confidence: "High",
+    due_date: forwardDays(20),
+    impact_value: "18 mentor matches confirmed",
+  },
+  {
+    commitment_id: "commitment-004",
+    partner_name: "Atlas Logistics",
+    milestone: "Finalize onboarding playbook refresh",
+    owner: "Operations",
+    status: "In review",
+    confidence: "Low",
+    due_date: forwardDays(9),
+    impact_value: "Reduce onboarding time by 20%",
+  },
+  {
+    commitment_id: "commitment-005",
+    partner_name: "Harbor Finance",
+    milestone: "Confirm scholarship co-funding for summer cohort",
+    owner: "Fundraising",
+    status: "On track",
+    confidence: "Medium",
+    due_date: forwardDays(15),
+    impact_value: "$150k co-funding commitment",
   },
 ];
 
@@ -376,6 +545,70 @@ const run = async () => {
         confidence TEXT NOT NULL,
         freshness_days NUMERIC(6, 2) NOT NULL,
         coverage_percent NUMERIC(6, 2) NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS impact_vault.scholar_voice_metrics (
+        id SERIAL PRIMARY KEY,
+        snapshot_date DATE UNIQUE NOT NULL,
+        checkins_count INTEGER NOT NULL,
+        sentiment_score NUMERIC(6, 2) NOT NULL,
+        sentiment_change NUMERIC(6, 2) NOT NULL,
+        needs_flagged INTEGER NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS impact_vault.scholar_voice_entries (
+        id SERIAL PRIMARY KEY,
+        entry_id TEXT UNIQUE NOT NULL,
+        tag TEXT NOT NULL,
+        quote TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        owner TEXT NOT NULL,
+        action TEXT NOT NULL,
+        highlight BOOLEAN NOT NULL DEFAULT FALSE,
+        observed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS impact_vault.cohort_momentum_cards (
+        id SERIAL PRIMARY KEY,
+        card_id TEXT UNIQUE NOT NULL,
+        tag TEXT NOT NULL,
+        time_label TEXT NOT NULL,
+        title TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        owner TEXT NOT NULL,
+        next_step TEXT NOT NULL,
+        accent BOOLEAN NOT NULL DEFAULT FALSE,
+        order_index INTEGER NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS impact_vault.cohort_momentum_timeline (
+        id SERIAL PRIMARY KEY,
+        timeline_id TEXT UNIQUE NOT NULL,
+        week_label TEXT NOT NULL,
+        title TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        highlight BOOLEAN NOT NULL DEFAULT FALSE,
+        order_index INTEGER NOT NULL
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS impact_vault.partner_commitments (
+        id SERIAL PRIMARY KEY,
+        commitment_id TEXT UNIQUE NOT NULL,
+        partner_name TEXT NOT NULL,
+        milestone TEXT NOT NULL,
+        owner TEXT NOT NULL,
+        status TEXT NOT NULL,
+        confidence TEXT NOT NULL,
+        due_date DATE,
+        impact_value TEXT NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `);
@@ -525,6 +758,117 @@ const run = async () => {
       );
     }
 
+    await client.query(
+      `
+      INSERT INTO impact_vault.scholar_voice_metrics
+        (snapshot_date, checkins_count, sentiment_score, sentiment_change, needs_flagged, updated_at)
+      VALUES
+        ($1, $2, $3, $4, $5, ${voiceMetrics.updated_at})
+      ON CONFLICT (snapshot_date)
+      DO UPDATE SET
+        checkins_count = EXCLUDED.checkins_count,
+        sentiment_score = EXCLUDED.sentiment_score,
+        sentiment_change = EXCLUDED.sentiment_change,
+        needs_flagged = EXCLUDED.needs_flagged,
+        updated_at = EXCLUDED.updated_at;
+      `,
+      [
+        voiceMetrics.snapshot_date,
+        voiceMetrics.checkins_count,
+        voiceMetrics.sentiment_score,
+        voiceMetrics.sentiment_change,
+        voiceMetrics.needs_flagged,
+      ]
+    );
+
+    for (const entry of voiceEntries) {
+      await client.query(
+        `
+        INSERT INTO impact_vault.scholar_voice_entries
+          (entry_id, tag, quote, summary, owner, action, highlight, observed_at)
+        VALUES
+          ($1, $2, $3, $4, $5, $6, $7, ${entry.observed_at})
+        ON CONFLICT (entry_id)
+        DO UPDATE SET
+          tag = EXCLUDED.tag,
+          quote = EXCLUDED.quote,
+          summary = EXCLUDED.summary,
+          owner = EXCLUDED.owner,
+          action = EXCLUDED.action,
+          highlight = EXCLUDED.highlight,
+          observed_at = EXCLUDED.observed_at;
+        `,
+        [
+          entry.entry_id,
+          entry.tag,
+          entry.quote,
+          entry.summary,
+          entry.owner,
+          entry.action,
+          entry.highlight,
+        ]
+      );
+    }
+
+    for (const card of momentumCards) {
+      await client.query(
+        `
+        INSERT INTO impact_vault.cohort_momentum_cards
+          (card_id, tag, time_label, title, summary, owner, next_step, accent, order_index)
+        VALUES
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ON CONFLICT (card_id)
+        DO UPDATE SET
+          tag = EXCLUDED.tag,
+          time_label = EXCLUDED.time_label,
+          title = EXCLUDED.title,
+          summary = EXCLUDED.summary,
+          owner = EXCLUDED.owner,
+          next_step = EXCLUDED.next_step,
+          accent = EXCLUDED.accent,
+          order_index = EXCLUDED.order_index,
+          updated_at = NOW();
+        `,
+        [
+          card.card_id,
+          card.tag,
+          card.time_label,
+          card.title,
+          card.summary,
+          card.owner,
+          card.next_step,
+          card.accent,
+          card.order_index,
+        ]
+      );
+    }
+
+    for (const item of momentumTimeline) {
+      await client.query(
+        `
+        INSERT INTO impact_vault.cohort_momentum_timeline
+          (timeline_id, week_label, title, summary, highlight, order_index)
+        VALUES
+          ($1, $2, $3, $4, $5, $6)
+        ON CONFLICT (timeline_id)
+        DO UPDATE SET
+          week_label = EXCLUDED.week_label,
+          title = EXCLUDED.title,
+          summary = EXCLUDED.summary,
+          highlight = EXCLUDED.highlight,
+          order_index = EXCLUDED.order_index;
+        `,
+        [
+          item.timeline_id,
+          item.week_label,
+          item.title,
+          item.summary,
+          item.highlight,
+          item.order_index,
+        ]
+      );
+    }
+
     for (const decision of decisions) {
       await client.query(
         `
@@ -550,6 +894,37 @@ const run = async () => {
           decision.due_date,
           decision.status,
           decision.priority,
+        ]
+      );
+    }
+
+    for (const commitment of commitments) {
+      await client.query(
+        `
+        INSERT INTO impact_vault.partner_commitments
+          (commitment_id, partner_name, milestone, owner, status, confidence, due_date, impact_value)
+        VALUES
+          ($1, $2, $3, $4, $5, $6, $7, $8)
+        ON CONFLICT (commitment_id)
+        DO UPDATE SET
+          partner_name = EXCLUDED.partner_name,
+          milestone = EXCLUDED.milestone,
+          owner = EXCLUDED.owner,
+          status = EXCLUDED.status,
+          confidence = EXCLUDED.confidence,
+          due_date = EXCLUDED.due_date,
+          impact_value = EXCLUDED.impact_value,
+          updated_at = NOW();
+        `,
+        [
+          commitment.commitment_id,
+          commitment.partner_name,
+          commitment.milestone,
+          commitment.owner,
+          commitment.status,
+          commitment.confidence,
+          commitment.due_date,
+          commitment.impact_value,
         ]
       );
     }
